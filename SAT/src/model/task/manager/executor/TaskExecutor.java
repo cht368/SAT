@@ -5,10 +5,13 @@
  */
 package model.task.manager.executor;
 
+import java.net.Socket;
+
 /**
  *
  * @author Ega Prianto
  */
 public abstract class TaskExecutor implements Runnable {
+    private Socket connection;
     
 }

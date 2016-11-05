@@ -7,6 +7,8 @@ package model.task.manager;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import model.packet.Packet;
+import model.packet.PacketChatSend;
+import model.task.manager.executor.TaskChatSendExecutor;
 import model.task.manager.executor.TaskExecutor;
 
 /**
@@ -32,7 +34,7 @@ public class TaskManager implements Runnable {
                 Packet newPacket = packetQueue.poll();
                 switch(newPacket.command){
                     case CHAT_SEND:
-                        new TaskExecutor
+                        new TaskChatSendExecutor((PacketChatSend)newPacket);
                 }
             }
         }

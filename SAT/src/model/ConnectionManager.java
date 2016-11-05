@@ -16,6 +16,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -35,8 +36,8 @@ public class ConnectionManager implements Runnable {
     private Thread thread;
     private boolean isFinish;
     private List<String> serverList;
-    private CopyOnWriteArrayList<Socket> connectedSockets;
-    private CopyOnWriteArrayList<Socket> connectedServerSockets;
+    private ConcurrentHashMap<String,Socket> connectedSockets;
+    private ConcurrentHashMap<String,Socket> connectedServerSockets;
     private CopyOnWriteArrayList<ConnectionReceiver> connectionReceivers;
     private ConcurrentLinkedQueue<Packet> packetQueue;
 
