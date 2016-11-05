@@ -5,6 +5,8 @@
  */
 package model.packet;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Ega Prianto
@@ -12,15 +14,22 @@ package model.packet;
 public class PacketCreateGroup extends Packet{
     public String id_group;
     public String nama;
+    public ArrayList<String> listID; 
     
-    public PacketCreateGroup(PacketType command, int serverLoad, SourceType sourceType, String id_group, String nama) {
+    public PacketCreateGroup(PacketType command, int serverLoad, SourceType sourceType, String id_group, String nama,ArrayList<String> listId) {
         super(command, serverLoad, sourceType);
         this.id_group=id_group;
         this.nama=nama;
+        this.listID = listId;
     }
 
     @Override
     public String getBodyData() {
-        return id_group + ";" + nama;
+        String hasil="";
+        for (int i = 0; i < listID.size()-1; i++) {
+            hasil+=listID.get(i)+";";
+        }
+        hasil+=listID.get(listID.size()-1);
+        return id_group + ";" + nama+";"+hasil;
     }
 }

@@ -26,11 +26,12 @@ public class TaskChatSendExecutor extends TaskExecutor{
         PacketChatSend receivedPacket = (PacketChatSend) this.packet;
         if (receivedPacket.chatType == ChatType.GROUP) {
             
+                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }else{
             if (receivedPacket.chatType == ChatType.BROADCAST) {
                 
-            }else if(receivedPacket.chatType == ChatType.PRIVATE){
                     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }else if(receivedPacket.chatType == ChatType.PRIVATE){
             }else{
                 
             }
