@@ -9,6 +9,20 @@ package model.packet;
  *
  * @author Ega Prianto
  */
-public class PacketGetKey {
-    
+public class PacketGetKey extends Packet {
+
+    private String id_pengirim;
+    private String id_group;
+
+    public PacketGetKey(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String id_pengirim, String id_group) {
+        super(command, serverLoad, sourceType);
+        this.id_pengirim=id_pengirim;
+        this.id_group=id_group;
+    }
+
+    @Override
+    public String getBodyData() {
+        return id_pengirim+";"+id_group;
+    }
+
 }
