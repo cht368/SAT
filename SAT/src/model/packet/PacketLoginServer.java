@@ -11,7 +11,7 @@ package model.packet;
  */
 public class PacketLoginServer extends Packet {
 
-    private String id;
+    public String id;
 
     public PacketLoginServer(PacketType command, int serverLoad, SourceType sourceType, String id) {
         super(command, serverLoad, sourceType);

@@ -6,12 +6,36 @@
 package model.task.manager.executor;
 
 import java.net.Socket;
+import java.util.concurrent.ConcurrentHashMap;
+import model.packet.Packet;
 
 /**
  *
  * @author Ega Prianto
  */
 public abstract class TaskExecutor implements Runnable {
-    private Socket connection;
-    
+
+    protected ConcurrentHashMap<String, Socket> connectedSockets;
+    protected ConcurrentHashMap<String, Socket> connectedServerSockets;
+    protected Thread thread;
+    protected Packet packet;
+    protected boolean isFinish;
+
+    public TaskExecutor(ConcurrentHashMap<String, Socket> connectedSockets, ConcurrentHashMap<String, Socket> connectedServerSockets, Packet packet) {
+        this.connectedSockets = connectedSockets;
+        this.connectedServerSockets = connectedServerSockets;
+        this.packet = packet;
+        this.thread = new Thread(this);
+    }
+
+    public void start() {
+        this.thread.start();
+        this.isFinish = false;
+    }
+
+    public void stop() throws InterruptedException {
+        this.isFinish = true;
+        this.thread.join();
+    }
+
 }

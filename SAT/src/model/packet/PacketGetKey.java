@@ -11,8 +11,8 @@ package model.packet;
  */
 public class PacketGetKey extends Packet {
 
-    private String id_pengirim;
-    private String id_group;
+    public String id_pengirim;
+    public String id_group;
 
     public PacketGetKey(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String id_pengirim, String id_group) {
         super(command, serverLoad, sourceType);
