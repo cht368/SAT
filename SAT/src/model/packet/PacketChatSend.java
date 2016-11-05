@@ -9,25 +9,24 @@ package model.packet;
  *
  * @author Ega Prianto
  */
-public class PacketChatSend extends Packet{
+public class PacketChatSend extends Packet {
+
     private ChatType chatType;
     private String idPengirim;
     private String idPenerima;
     private String chat;
-    
-    public PacketChatSend(PacketType command, int serverLoad, SourceType sourceType) {
-        super(command, serverLoad, sourceType);
-    }
 
-    @Override
-    public void assignFromString(String string) {
-        String[] splitted = string.split(";");
-        this.splitted[0];
+    public PacketChatSend(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String idPengirim, String idPenerima, String chat) {
+        super(command, serverLoad, sourceType);
+        this.chatType=chatType;
+        this.idPenerima=idPenerima;
+        this.idPengirim=idPengirim;
+        this.chat= chat;
     }
 
     @Override
     public String getBodyData() {
-        return chatType+";"+idPengirim+";"+idPenerima+";"+chat;
+        return chatType + ";" + idPengirim + ";" + idPenerima + ";" + chat;
     }
-    
+
 }
