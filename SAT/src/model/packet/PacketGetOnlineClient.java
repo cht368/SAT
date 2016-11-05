@@ -9,6 +9,15 @@ package model.packet;
  *
  * @author Ega Prianto
  */
-public class PacketGetOnlineClient {
-    
+public class PacketGetOnlineClient extends Packet {
+
+    public PacketGetOnlineClient(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType) {
+        super(command, serverLoad, sourceType);
+    }
+
+    @Override
+    public String getBodyData() {
+        return "";
+    }
+
 }

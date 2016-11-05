@@ -9,6 +9,18 @@ package model.packet;
  *
  * @author Ega Prianto
  */
-public class PacketLoginServer {
-    
+public class PacketLoginServer extends Packet {
+
+    private String id;
+
+    public PacketLoginServer(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String id) {
+        super(command, serverLoad, sourceType);
+        this.id=id;
+    }
+
+    @Override
+    public String getBodyData() {
+        return id;
+    }
+
 }

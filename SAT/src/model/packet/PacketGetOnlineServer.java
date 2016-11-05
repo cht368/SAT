@@ -5,10 +5,29 @@
  */
 package model.packet;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Ega Prianto
  */
-public class PacketGetOnlineServer {
-    
+public class PacketGetOnlineServer extends Packet {
+
+    private ArrayList<String>listID;
+
+    public PacketGetOnlineServer(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, ArrayList listID) {
+        super(command, serverLoad, sourceType);
+        this.listID=listID;
+    }
+
+    @Override
+    public String getBodyData() {
+        String hasil="";
+        for (int i = 0; i < listID.size()-1; i++) {
+            hasil+=listID.get(i)+";";
+        }
+        hasil+=listID.get(listID.size()-1);
+        return hasil;
+    }
+
 }
