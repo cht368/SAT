@@ -13,7 +13,7 @@ public class PacketLogout extends Packet {
 
     private String id;
 
-    public PacketLogout(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String id) {
+    public PacketLogout(PacketType command, int serverLoad, SourceType sourceType, String id) {
         super(command, serverLoad, sourceType);
         this.id=id;
     }

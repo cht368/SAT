@@ -14,7 +14,7 @@ public class PacketRegister extends Packet {
     private String id;
     private String password;
 
-    public PacketRegister(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String id, String password) {
+    public PacketRegister(PacketType command, int serverLoad, SourceType sourceType, String id, String password) {
         super(command, serverLoad, sourceType);
         this.id=id;
         this.password=password;

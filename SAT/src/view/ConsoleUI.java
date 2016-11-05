@@ -5,9 +5,9 @@
  */
 package view;
 
+import controller.ChatServerController;
 import java.io.IOException;
 import java.util.Scanner;
-import model.ConnectionManager;
 
 /**
  *
@@ -18,6 +18,7 @@ public class ConsoleUI {
         System.out.println("Chat Server is started at:");
         Scanner sc = new Scanner(System.in);
         String port = sc.nextLine();
-        ConnectionManager connectionManager = new ConnectionManager(Integer.parseInt(port));
+        ChatServerController chatServerController = new ChatServerController();
+        chatServerController.startServer(port);
     }
 }
