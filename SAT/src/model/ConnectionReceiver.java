@@ -33,8 +33,7 @@ public class ConnectionReceiver implements Runnable {
     public void run() {
         while (!isFinish) {
             try {
-                String receiveData = inputReader.readLine();
-                // menerima input dari client dan membuat Task pada Queue.
+                
             } catch (IOException ex) {
                 Logger.getLogger(ConnectionReceiver.class.getName()).log(Level.SEVERE, null, ex);
             }

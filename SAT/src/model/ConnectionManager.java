@@ -64,14 +64,17 @@ public class ConnectionManager implements Runnable {
             }
             while (!isFinish) {
                 try {
+                    Socket clientSocket = serverSocket.accept();
+                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+
                     if (this.connectedSockets.size() + this.connectedServerSockets.size() <= limitConnection) {
-                        Socket clientSocket = serverSocket.accept();
+                        bw.write("Welcome to this server \n");
+                        bw.write("Connection Started");
                         createConnection(clientSocket);
                     } else {
                         //TODO Masih belum beres
-                        Socket clientSocket = serverSocket.accept();
-                        BufferedWriter bw =new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-                        bw.write("Sorry, the server is full please try another server ["+this.serverList.get(0));
+                        bw.write("Sorry, the server is full please try another server \n");
+                        bw.write(this.serverList.get(0));
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
