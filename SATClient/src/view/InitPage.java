@@ -10,12 +10,13 @@ package view;
  * @author Ega Prianto
  */
 public class InitPage extends javax.swing.JPanel {
-
+    GraphicalUI gui;
     /**
      * Creates new form Lobby
      */
-    public InitPage() {
+    public InitPage(GraphicalUI gui) {
         initComponents();
+        this.gui = gui;
     }
 
     /**
@@ -41,6 +42,11 @@ public class InitPage extends javax.swing.JPanel {
 
         jButton2.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jButton2.setText("Login");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jButton3.setText("Quit");
@@ -80,6 +86,11 @@ public class InitPage extends javax.swing.JPanel {
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        ChatRoom newChatRoom = new ChatRoom();
+        newChatRoom.setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
