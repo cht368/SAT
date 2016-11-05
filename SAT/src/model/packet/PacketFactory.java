@@ -14,7 +14,8 @@ public class PacketFactory {
         String[] splitted = string.split(";");
         PacketType packetType = PacketType.valueOf(splitted[0]);
         switch(packetType){
-            
+            case CHAT_SEND:
+                return new PacketChatSend(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), ChatType.valueOf(splitted[3]), splitted[4], splitted[5], splitted[6]);
         }
         return null;
     }

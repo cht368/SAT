@@ -38,7 +38,16 @@ public class ConnectionManager implements Runnable {
     private CopyOnWriteArrayList<ConnectionReceiver> connectionReceivers;
 
     public ConnectionManager() throws IOException {
+        init();
         this.serverSocket = new ServerSocket(PORT, 0, InetAddress.getLocalHost());
+    }
+
+    public ConnectionManager(int customPort) throws IOException {
+        init();
+        this.serverSocket = new ServerSocket(customPort, 0, InetAddress.getLocalHost());
+    }
+
+    private void init() {
         this.thread = new Thread(this);
         this.connectedSockets = new CopyOnWriteArrayList<Socket>();
         this.isFinish = false;
