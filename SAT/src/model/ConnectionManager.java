@@ -16,9 +16,11 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.packet.Packet;
 
 /**
  *
@@ -36,28 +38,30 @@ public class ConnectionManager implements Runnable {
     private CopyOnWriteArrayList<Socket> connectedSockets;
     private CopyOnWriteArrayList<Socket> connectedServerSockets;
     private CopyOnWriteArrayList<ConnectionReceiver> connectionReceivers;
+    private ConcurrentLinkedQueue<Packet> packetQueue;
 
-    public ConnectionManager() throws IOException {
-        init();
+    public ConnectionManager(ConcurrentLinkedQueue<Packet> packetQueue) throws IOException {
+        init(packetQueue);
         this.serverSocket = new ServerSocket(PORT, 0, InetAddress.getLocalHost());
     }
 
-    public ConnectionManager(int customPort) throws IOException {
-        init();
+    public ConnectionManager(int customPort,ConcurrentLinkedQueue<Packet> packetQueue) throws IOException {
+        init(packetQueue);
         this.serverSocket = new ServerSocket(customPort, 0, InetAddress.getLocalHost());
     }
 
-    private void init() {
+    private void init(ConcurrentLinkedQueue<Packet> packetQueue) {
         this.thread = new Thread(this);
         this.connectedSockets = new CopyOnWriteArrayList<Socket>();
         this.isFinish = false;
         this.connectionReceivers = new CopyOnWriteArrayList<ConnectionReceiver>();
         this.serverList = new ArrayList<String>();
         this.serverList.add("127.0.0.1:2406");
+        this.packetQueue = packetQueue;
     }
 
     public void createConnection(Socket socket) throws IOException {
-        ConnectionReceiver newConnection = new ConnectionReceiver(socket);
+        ConnectionReceiver newConnection = new ConnectionReceiver(socket,this.packetQueue);
         this.connectedSockets.add(socket);
         this.connectionReceivers.add(newConnection);
         newConnection.start();

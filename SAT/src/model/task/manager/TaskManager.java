@@ -5,6 +5,10 @@
  */
 package model.task.manager;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+import model.packet.Packet;
+import model.task.manager.executor.TaskExecutor;
+
 /**
  *
  * @author Ega Prianto
@@ -13,16 +17,24 @@ public class TaskManager implements Runnable {
 
     private boolean isFinish;
     private Thread thread;
+    private ConcurrentLinkedQueue<Packet> packetQueue;
 
-    public TaskManager() {
+    public TaskManager(ConcurrentLinkedQueue<Packet> packetQueue) {
         this.thread = new Thread(this);
+        this.packetQueue = packetQueue;
     }
     
     
     @Override
     public void run() {
         while (!isFinish) {
-            
+            if (!packetQueue.isEmpty()) {
+                Packet newPacket = packetQueue.poll();
+                switch(newPacket.command){
+                    case CHAT_SEND:
+                        new TaskExecutor
+                }
+            }
         }
     }
     

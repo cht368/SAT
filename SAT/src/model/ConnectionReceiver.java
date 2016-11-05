@@ -27,11 +27,11 @@ public class ConnectionReceiver implements Runnable {
     private boolean isFinish;
     private ConcurrentLinkedQueue<Packet> packetQueue;
 
-    public ConnectionReceiver(Socket socket) throws IOException {
+    public ConnectionReceiver(Socket socket,ConcurrentLinkedQueue<Packet> packetQueue) throws IOException {
         this.socket = socket;
         inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.thread = new Thread(this);
-        this.packetQueue = new ConcurrentLinkedQueue<>();
+        this.packetQueue = packetQueue;
     }
 
     @Override
