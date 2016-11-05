@@ -18,7 +18,7 @@ public class GraphicalUI extends javax.swing.JFrame {
      */
     public GraphicalUI() {
         initComponents();
-        setMainPanelTo(new StartUI());
+        setMainPanelTo(new StartUI(this));
         pack();
     }
     
