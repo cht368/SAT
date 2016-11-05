@@ -47,3 +47,4 @@ Temporary Items
 .apdisk
 /SAT/build/
 /SATClient/build/
+SATClient/nbproject/private/private.properties

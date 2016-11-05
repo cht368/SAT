@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.packet.Packet;
@@ -19,9 +20,9 @@ import model.packet.PacketCreateGroup;
  *
  * @author Ega Prianto
  */
-public class TaskCreateGroupExecutor extends TaskExecutor{
+public class TaskCreateGroupExecutor extends TaskExecutor {
 
-    public TaskCreateGroupExecutor(ConcurrentHashMap<String, Socket> connectedSockets, ConcurrentHashMap<String, Socket> connectedServerSockets, Packet packet) {
+    public TaskCreateGroupExecutor(ConcurrentHashMap<String, Socket> connectedSockets, CopyOnWriteArrayList< Socket> connectedServerSockets, Packet packet) {
         super(connectedSockets, connectedServerSockets, packet);
     }
 
@@ -33,8 +34,7 @@ public class TaskCreateGroupExecutor extends TaskExecutor{
             // TODO
             Socket socket = connectedSockets.get("1321");
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-           
-            
+
         } catch (IOException ex) {
             Logger.getLogger(TaskCreateGroupExecutor.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -45,5 +45,5 @@ public class TaskCreateGroupExecutor extends TaskExecutor{
             }
         }
     }
-    
+
 }

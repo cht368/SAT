@@ -10,6 +10,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.sql.Statement;
 import java.util.Scanner;
 
 /**
@@ -18,7 +24,7 @@ import java.util.Scanner;
  */
 public class Tester {
     public static void main(String[] args) throws IOException {
-        Socket clientSocket = new Socket("192.168.1.101", 2013);  
+        Socket clientSocket = new Socket("192.168.1.101", 2013);
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
         Scanner sc = new Scanner(System.in);
     }

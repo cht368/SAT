@@ -7,6 +7,7 @@ package model.task.manager.executor;
 
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import model.packet.Packet;
 
 /**
@@ -16,12 +17,12 @@ import model.packet.Packet;
 public abstract class TaskExecutor implements Runnable {
 
     protected ConcurrentHashMap<String, Socket> connectedSockets;
-    protected ConcurrentHashMap<String, Socket> connectedServerSockets;
+    protected CopyOnWriteArrayList< Socket> connectedServerSockets;
     protected Thread thread;
     protected Packet packet;
     protected boolean isFinish;
 
-    public TaskExecutor(ConcurrentHashMap<String, Socket> connectedSockets, ConcurrentHashMap<String, Socket> connectedServerSockets, Packet packet) {
+    public TaskExecutor(ConcurrentHashMap<String, Socket> connectedSockets, CopyOnWriteArrayList< Socket> connectedServerSockets, Packet packet) {
         this.connectedSockets = connectedSockets;
         this.connectedServerSockets = connectedServerSockets;
         this.packet = packet;
