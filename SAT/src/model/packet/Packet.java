@@ -26,7 +26,7 @@ public abstract class Packet extends Observable {
     
     @Override
     public  String toString(){
-        return command+";"+serverLoad+";"+sourceType+";"+bodyData;
+        return command+";"+serverLoad+";"+sourceType+";"+bodyData+"\n";
     }
 
     public abstract String getBodyData();

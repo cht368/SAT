@@ -10,8 +10,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.packet.Packet;
+import model.packet.PacketFactory;
 
 /**
  *
@@ -22,19 +25,22 @@ public class ConnectionReceiver implements Runnable {
     private Thread thread;
     private BufferedReader inputReader;
     private boolean isFinish;
+    private ConcurrentLinkedQueue<Packet> packetQueue;
 
     public ConnectionReceiver(Socket socket) throws IOException {
         this.socket = socket;
         inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.thread = new Thread(this);
+        this.packetQueue = new ConcurrentLinkedQueue<>();
     }
 
     @Override
     public void run() {
         while (!isFinish) {
             try {
-                String receiveData = inputReader.readLine();
-                // menerima input dari client dan membuat Task pada Queue.
+                String input = inputReader.readLine();
+                Packet packet = PacketFactory.createPacketFromString(input);
+                packetQueue.add(packet);
             } catch (IOException ex) {
                 Logger.getLogger(ConnectionReceiver.class.getName()).log(Level.SEVERE, null, ex);
             }

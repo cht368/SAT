@@ -26,7 +26,7 @@ public class PacketChatSend extends Packet {
 
     @Override
     public String getBodyData() {
-        return chatType + ";" + idPengirim + ";" + idPenerima + ";" + chat;
+            return chatType + ";" + idPengirim + ";" + idPenerima + ";" + chat;
     }
 
 }
