@@ -3,15 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package model.task.manager.executor;
-
-import java.net.Socket;
+package view;
 
 /**
  *
  * @author Ega Prianto
  */
-public abstract class TaskExecutor implements Runnable {
-    private Socket connection;
-    
+public enum ConsoleCommandType {
+    GET_CONNECTED_CLIENT,
+    GET_CONNECTED_SERVER,
+    GET_SERVER_LOAD
 }

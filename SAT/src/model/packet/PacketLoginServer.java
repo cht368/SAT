@@ -13,7 +13,7 @@ public class PacketLoginServer extends Packet {
 
     private String id;
 
-    public PacketLoginServer(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String id) {
+    public PacketLoginServer(PacketType command, int serverLoad, SourceType sourceType, String id) {
         super(command, serverLoad, sourceType);
         this.id=id;
     }

@@ -15,7 +15,7 @@ public class PacketGetOnlineServer extends Packet {
 
     private ArrayList<String>listID;
 
-    public PacketGetOnlineServer(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, ArrayList listID) {
+    public PacketGetOnlineServer(PacketType command, int serverLoad, SourceType sourceType, ArrayList<String> listID) {
         super(command, serverLoad, sourceType);
         this.listID=listID;
     }
