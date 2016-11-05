@@ -43,7 +43,6 @@ public class ConnectionManager implements Runnable {
         this.connectionReceivers.add(newConnection);
         newConnection.start();
     }
-
     
     @Override
     public void run() {
