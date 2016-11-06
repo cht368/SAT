@@ -5,7 +5,10 @@
  */
 package model.task.manager;
 
+import java.net.Socket;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import model.packet.Packet;
 import model.packet.PacketChatSend;
 import model.task.manager.executor.TaskChatSendExecutor;
@@ -19,36 +22,38 @@ public class TaskManager implements Runnable {
 
     private boolean isFinish;
     private Thread thread;
+    private ConcurrentHashMap<String, Socket> connectedSockets;
+    private CopyOnWriteArrayList< Socket> connectedServerSockets;
     private ConcurrentLinkedQueue<Packet> packetQueue;
 
-    public TaskManager(ConcurrentLinkedQueue<Packet> packetQueue) {
+    public TaskManager(ConcurrentHashMap<String, Socket> connectedSockets, CopyOnWriteArrayList< Socket> connectedServerSockets, ConcurrentLinkedQueue<Packet> packetQueue) {
         this.thread = new Thread(this);
+        this.connectedSockets = connectedSockets;
+        this.connectedServerSockets = connectedServerSockets;
         this.packetQueue = packetQueue;
     }
-    
-    
+
     @Override
     public void run() {
         while (!isFinish) {
             if (!packetQueue.isEmpty()) {
                 Packet newPacket = packetQueue.poll();
-                switch(newPacket.command){
+                switch (newPacket.command) {
                     case CHAT_SEND:
-                        new TaskChatSendExecutor((PacketChatSend)newPacket);
+                        new TaskChatSendExecutor(connectedSockets, connectedServerSockets, newPacket).start();
                 }
             }
         }
     }
-    
-    public void start(){
+
+    public void start() {
         this.thread.start();
         this.isFinish = false;
     }
-    
-    public void stop() throws InterruptedException{
+
+    public void stop() throws InterruptedException {
         this.isFinish = true;
         this.thread.join();
     }
-    
-    
+
 }

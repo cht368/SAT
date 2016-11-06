@@ -6,9 +6,13 @@
 package controller;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import model.ConnectionManager;
+import model.ConnectionReceiver;
 import model.packet.Packet;
 import model.task.manager.TaskManager;
 
@@ -21,16 +25,18 @@ public class ChatServerController {
     private ConnectionManager connectionManager;
     private TaskManager taskManager;
     private ConcurrentLinkedQueue<Packet> packetQueue;
+    private ConcurrentHashMap<String, Socket> connectedSockets;
+    private CopyOnWriteArrayList< Socket> connectedServerSockets;
 
     public ChatServerController() {
         packetQueue = new ConcurrentLinkedQueue<>();
+        connectedSockets = new ConcurrentHashMap<>();
+        connectedServerSockets = new CopyOnWriteArrayList<>();
     }
-    
-    
-    
+
     public void startServer(int port) throws IOException {
-        connectionManager = new ConnectionManager(port,packetQueue);
-        taskManager = new TaskManager(packetQueue);
+        connectionManager = new ConnectionManager(connectedSockets, connectedServerSockets, port, packetQueue);
+        taskManager = new TaskManager(connectedSockets, connectedServerSockets, packetQueue);
         taskManager.start();
         connectionManager.start();
     }
@@ -46,5 +52,5 @@ public class ChatServerController {
     public List<String> getServerLoad() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
 }

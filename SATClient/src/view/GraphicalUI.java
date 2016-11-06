@@ -45,6 +45,8 @@ public class GraphicalUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jPanelMain.setMaximumSize(new java.awt.Dimension(500, 500));
+        jPanelMain.setMinimumSize(new java.awt.Dimension(500, 500));
         jPanelMain.setLayout(new java.awt.CardLayout());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

@@ -16,13 +16,17 @@ public class PacketFactory {
     public static Packet createPacketFromString(String string) {
         String[] splitted = string.split(";");
         PacketType packetType = PacketType.valueOf(splitted[0]);
+        ArrayList<String> listID = new ArrayList<>();
         switch (packetType) {
             case CHAT_SEND:
                 return new PacketChatSend(packetType, Integer.parseInt(splitted[1]),
                         SourceType.valueOf(splitted[2]), ChatType.valueOf(splitted[3]),
                         splitted[4], splitted[5], splitted[6]);
             case CREATE_GROUP:
-                return new PacketCreateGroup(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3], splitted[4]);
+                for (int i = 5; i < splitted.length; i++) {
+                    listID.add(splitted[i]);
+                }
+                return new PacketCreateGroup(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3], splitted[4], listID);
             case GET_CHAT_CLIENT:
                 return new PacketGetChatClient(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3], splitted[4], Long.parseLong(splitted[5]));
             case GET_CHAT_SERVER:
@@ -30,7 +34,6 @@ public class PacketFactory {
             case GET_ONLINE_CLIENT:
                 return new PacketGetChatClient(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3], splitted[4], Long.parseLong(splitted[5]));
             case GET_ONLINE_SERVER:
-                ArrayList<String> listID = new ArrayList<>();
                 for (int i = 3; i < splitted.length; i++) {
                     listID.add(splitted[i]);
                 }

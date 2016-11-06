@@ -11,8 +11,8 @@ package model.packet;
  */
 public class PacketRegister extends Packet {
 
-    private String id;
-    private String password;
+    public String id;
+    public String password;
 
     public PacketRegister(PacketType command, int serverLoad, SourceType sourceType, String id, String password) {
         super(command, serverLoad, sourceType);

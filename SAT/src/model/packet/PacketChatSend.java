@@ -11,10 +11,10 @@ package model.packet;
  */
 public class PacketChatSend extends Packet {
 
-    private ChatType chatType;
-    private String idPengirim;
-    private String idPenerima;
-    private String chat;
+    public ChatType chatType;
+    public String idPengirim;
+    public String idPenerima;
+    public String chat;
 
     public PacketChatSend(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String idPengirim, String idPenerima, String chat) {
         super(command, serverLoad, sourceType);
