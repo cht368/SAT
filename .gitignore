@@ -48,3 +48,5 @@ Temporary Items
 /SAT/build/
 /SATClient/build/
 SATClient/nbproject/private/private.properties
+/SAT/dist/
+/SATClient/dist/
