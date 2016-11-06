@@ -15,13 +15,14 @@ public class PacketFactory {
 
     public static Packet createPacketFromString(String string) {
         String[] splitted = string.split(";");
+        System.out.println("Received Packet :\n"+string);
         PacketType packetType = PacketType.valueOf(splitted[0]);
         ArrayList<String> listID = new ArrayList<>();
         switch (packetType) {
             case CHAT_SEND:
                 return new PacketChatSend(packetType, Integer.parseInt(splitted[1]),
                         SourceType.valueOf(splitted[2]), ChatType.valueOf(splitted[3]),
-                        splitted[4], splitted[5], splitted[6],Long.parseLong(splitted[7]));
+                        splitted[4], splitted[5], splitted[6],splitted[7]);
             case CREATE_GROUP:
                 for (int i = 5; i < splitted.length; i++) {
                     listID.add(splitted[i]);

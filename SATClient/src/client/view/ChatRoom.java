@@ -10,11 +10,14 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import server.model.db.JDBCMySQLManager;
 import server.model.packet.ChatType;
 import server.model.packet.PacketChatSend;
 import server.model.packet.PacketType;
@@ -24,27 +27,33 @@ import server.model.packet.SourceType;
  *
  * @author ASUS A455LF
  */
-public class ChatRoom extends javax.swing.JFrame implements Observer {
+public class ChatRoom extends javax.swing.JFrame implements Observer, Runnable {
 
-    public Chat chats;
-    public ChatType chatType;
-    public String userId;
-    public String idLawan;
+    private Chat chats;
+    private ChatType chatType;
+    private String userId;
+    private String idLawan;
     private BufferedWriter bufferedWriter;
-    
 
-    
-
-    /**
-     * Creates new form ChatRoom
-     */
-    public ChatRoom() {
+    public ChatRoom(Chat chats, ChatType chatType, String userId, String idLawan, OutputStream outputStream) {
         initComponents();
+        this.chats = chats;
+        this.chatType = chatType;
+        this.userId = userId;
+        this.idLawan = idLawan;
+        bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+        System.out.println(toString());
     }
 
-    public void setOutputStream(OutputStream outputStream){
+    @Override
+    public String toString() {
+        return "ChatRoom{" + "chats=" + chats + ", chatType=" + chatType + ", userId=" + userId + ", idLawan=" + idLawan + ", jTextFieldChatInput=" + jTextFieldChatInput.getText() + '}';
+    }
+
+    public void setOutputStream(OutputStream outputStream) {
         bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -111,48 +120,20 @@ public class ChatRoom extends javax.swing.JFrame implements Observer {
 
     private void jButtonSendChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendChatActionPerformed
         try {
-            PacketChatSend newPacketChatSend = new PacketChatSend(PacketType.CHAT_SEND, 0, SourceType.CLIENT, chatType, userId, this.idLawan, this.jTextFieldChatInput.getText(), System.currentTimeMillis());
-            this.chats.addSelfChat(newPacketChatSend.chat,newPacketChatSend.timestamp);
+            System.out.println(toString());
+            long currentTime = System.currentTimeMillis();
+            Date currentDate = new Date(currentTime);
+            PacketChatSend newPacketChatSend = new PacketChatSend(PacketType.CHAT_SEND, 0, SourceType.CLIENT, chatType, userId, this.idLawan, this.jTextFieldChatInput.getText(), JDBCMySQLManager.DATE_FORMAT.format(currentDate));
+            this.chats.addSelfChat(newPacketChatSend.chat, currentTime);
+            System.out.println("Sending packet : " + newPacketChatSend.toString());
+            System.out.println("body data : " + newPacketChatSend.getBodyData());
             bufferedWriter.write(newPacketChatSend.toString());
             bufferedWriter.flush();
         } catch (IOException ex) {
             JOptionPane.showConfirmDialog(null, "Send Chat Failed", "Send Error", JOptionPane.NO_OPTION, JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jButtonSendChatActionPerformed
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ChatRoom.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ChatRoom.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ChatRoom.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ChatRoom.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ChatRoom().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonSendChat;
@@ -166,5 +147,10 @@ public class ChatRoom extends javax.swing.JFrame implements Observer {
     public void update(Observable o, Object arg) {
         Chat update = (Chat) o;
         this.jTextAreaChatArea.setText(update.toString());
+    }
+
+    @Override
+    public void run() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

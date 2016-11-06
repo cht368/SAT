@@ -5,6 +5,9 @@
  */
 package server.model.packet;
 
+import java.util.Date;
+import server.model.db.JDBCMySQLManager;
+
 /**
  *
  * @author Ega Prianto
@@ -15,9 +18,9 @@ public class PacketChatSend extends Packet {
     public String idPengirim;
     public String idPenerima;
     public String chat;
-    public long timestamp;
+    public String timestamp;
 
-    public PacketChatSend(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String idPengirim, String idPenerima, String chat,long timestamp) {
+    public PacketChatSend(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String idPengirim, String idPenerima, String chat,String timestamp) {
         super(command, serverLoad, sourceType);
         this.chatType=chatType;
         this.idPenerima=idPenerima;

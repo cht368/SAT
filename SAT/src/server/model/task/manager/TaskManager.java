@@ -38,8 +38,10 @@ public class TaskManager implements Runnable {
         while (!isFinish) {
             if (!packetQueue.isEmpty()) {
                 Packet newPacket = packetQueue.poll();
+                System.out.println("Assign Task");
                 switch (newPacket.command) {
                     case CHAT_SEND:
+                        System.out.println("Task Chat Send Assigned");
                         new TaskChatSendExecutor(connectedSockets, connectedServerSockets, newPacket).start();
                 }
             }

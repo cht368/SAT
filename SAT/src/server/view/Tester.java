@@ -16,6 +16,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Scanner;
 
 /**
@@ -24,8 +26,13 @@ import java.util.Scanner;
  */
 public class Tester {
     public static void main(String[] args) throws IOException {
-        Socket clientSocket = new Socket("localhost", 2013);
-        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-        Scanner sc = new Scanner(System.in);
+//        Socket clientSocket = new Socket("localhost", 2013);
+//        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+//        Scanner sc = new Scanner(System.in);
+//        long a =System.currentTimeMillis();
+//        Date date = new Date(1478430242412);
+//        Timestamp timestamp = new Timestamp();
+//
+//        1478430242412
     }
 }

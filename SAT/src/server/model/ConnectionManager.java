@@ -14,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -65,7 +66,7 @@ public class ConnectionManager implements Runnable {
         this.serverList = new ArrayList<>();
     }
 
-    public void createConnection(Socket socket) throws IOException {
+    public void createConnection(Socket socket) throws IOException, ClassNotFoundException, SQLException {
         ConnectionReceiver newConnection = new ConnectionReceiver(socket, this.packetQueue);
         this.connectedSockets.put(socket.getRemoteSocketAddress().toString().substring(1), socket);
         this.connectionReceivers.add(newConnection);
@@ -109,6 +110,10 @@ public class ConnectionManager implements Runnable {
                 }
             }
         } catch (IOException ex) {
+            Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
             Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

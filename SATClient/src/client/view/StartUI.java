@@ -98,6 +98,7 @@ public class StartUI extends javax.swing.JPanel {
             String ipAddress = this.jTextFieldIpAddress.getText();
             int port = Integer.parseInt(this.jTextFieldPort.getText());
             ConnectionReceiver connRecv = new ConnectionReceiver(ipAddress, port);
+            connRecv.start();
             this.gui.setMainPanelTo(new InitPage(this.gui, connRecv));
 //        } catch (IOException ex) {
 //            JOptionPane.showConfirmDialog(null, "Could not connect to the server", "Connection Error", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);

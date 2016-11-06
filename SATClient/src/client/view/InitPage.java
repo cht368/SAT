@@ -19,14 +19,14 @@ import server.model.packet.ChatType;
  * @author Ega Prianto
  */
 public class InitPage extends javax.swing.JPanel {
+
     GraphicalUI gui;
     ConnectionReceiver connRecv;
     String userId;
-    
+
     /**
      * Creates new form Lobby
      */
-
     InitPage(GraphicalUI gui, ConnectionReceiver connRecv) {
         initComponents();
         this.gui = gui;
@@ -102,20 +102,22 @@ public class InitPage extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLoginActionPerformed
-        try {
-            String idLawan = "cete";
-            Chat newChat = new PrivateChat(idLawan);
-            ChatRoom newChatRoom = new ChatRoom();
-            newChat.addObserver(newChatRoom);
-            this.connRecv.chatRoomsData.put(idLawan, newChat);
-            newChatRoom.chats = newChat;
-            newChatRoom.idLawan = idLawan;
-            newChatRoom.chatType = ChatType.PRIVATE;
-            newChatRoom.setOutputStream(connRecv.socket.getOutputStream());
-            newChatRoom.setVisible(true);
-        } catch (IOException ex) {
-            JOptionPane.showConfirmDialog(null, "Could not connect to the server", "Connection Error", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
-        }
+        String idLawan = "egaprianto";
+        userId = "cete";
+        ChatType chatType = ChatType.PRIVATE;
+        Chat newChat = new PrivateChat(idLawan);
+        this.connRecv.chatRoomsData.put(idLawan, newChat);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    new ChatRoom(newChat, chatType, userId, idLawan, connRecv.socket.getOutputStream()).setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(InitPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }).start();
+        
     }//GEN-LAST:event_jButtonLoginActionPerformed
 
 

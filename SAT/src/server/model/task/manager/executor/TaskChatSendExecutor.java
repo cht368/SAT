@@ -51,6 +51,7 @@ public class TaskChatSendExecutor extends TaskExecutor {
             if (receivedPacket.chatType == ChatType.GROUP) {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             } else {
+                System.out.println("Inserting Chat to Database");
                 dbManager.insertChat(receivedPacket.idPengirim, receivedPacket.idPenerima, receivedPacket.chat, receivedPacket.timestamp);
                 int a;
                 if (receivedPacket.chatType == ChatType.BROADCAST) {
@@ -70,6 +71,7 @@ public class TaskChatSendExecutor extends TaskExecutor {
                         String ipAddressPenerima = dbManager.getIpAddressPortUser(receivedPacket.idPenerima);
                         if (connectedSockets.containsKey(ipAddressPenerima)) {
                             Socket clientSocket = connectedSockets.get(ipAddressPenerima);
+                            System.out.println("Send chat to client "+ clientSocket.getRemoteSocketAddress().toString() + " :"+chatSend.toString());
                             bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                             bufferedWriter.write(chatSend.toString());
                             bufferedWriter.flush();

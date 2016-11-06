@@ -6,13 +6,16 @@
 package server.model.db;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +27,7 @@ public class JDBCMySQLManager {
 
     public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     public static final String DB_URL = "jdbc:mysql://localhost/sat";
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
     //  Database credentials
     public static final String USER = "root";
     public static final String PASS = "";
@@ -42,16 +46,14 @@ public class JDBCMySQLManager {
         this.stmt.close();
     }
 
-    public void insertChat(String id_sender, String id_receiver, String chat, long timestamp) throws SQLException {
-        Timestamp toInsertTimestamp = new Timestamp(timestamp);
-        PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO `chat` (`id_sender`, `id_receiver`, `chat_message`, `timestamp`) VALUES (?, ?,?, ?)");
+    public void insertChat(String id_sender, String id_receiver, String chat, String date) throws SQLException, ParseException {
+        PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO `chat` (`id_sender`, `id_receiver`, `chat_message`, `datetime`) VALUES (?, ?,?, ?)");
         preparedStatement.setString(1, id_sender);
         preparedStatement.setString(2, id_receiver);
         preparedStatement.setString(3, chat);
-        preparedStatement.setTimestamp(4, toInsertTimestamp);
+        preparedStatement.setString(4, date);
         preparedStatement.execute();
         preparedStatement.close();
-        conn.commit();
     }
 
     public void insertUser(String id, String id_server,String ip_address_port, String passwd, String prof_name, String public_key, String current_status) throws SQLException {
@@ -65,7 +67,6 @@ public class JDBCMySQLManager {
         preparedStatement.setString(7, current_status);
         preparedStatement.execute();
         preparedStatement.close();
-        conn.commit();        
     }
     
     public String getIpAddressPortUser(String id) throws SQLException{
