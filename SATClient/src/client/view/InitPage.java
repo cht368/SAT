@@ -6,9 +6,12 @@
 package client.view;
 
 import client.model.ConnectionReceiver;
+import client.model.ConnectionSender;
 import client.model.clientData.Chat;
 import client.model.clientData.PrivateChat;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -22,15 +25,18 @@ public class InitPage extends javax.swing.JPanel {
 
     GraphicalUI gui;
     ConnectionReceiver connRecv;
+    ConnectionSender connSend;
     String userId;
 
     /**
      * Creates new form Lobby
      */
-    InitPage(GraphicalUI gui, ConnectionReceiver connRecv) {
+    public InitPage(GraphicalUI gui, ConnectionReceiver connRecv) throws IOException {
         initComponents();
         this.gui = gui;
         this.connRecv = connRecv;
+        this.connSend = new ConnectionSender(new BufferedWriter(new OutputStreamWriter(connRecv.socket.getOutputStream())));
+        this.connSend.start();
     }
 
     /**
@@ -102,22 +108,20 @@ public class InitPage extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLoginActionPerformed
-        String idLawan = "egaprianto";
-        userId = "cete";
+        String idLawan = "cete";
+        userId = "egaprianto";
         ChatType chatType = ChatType.PRIVATE;
         Chat newChat = new PrivateChat(idLawan);
         this.connRecv.chatRoomsData.put(idLawan, newChat);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    new ChatRoom(newChat, chatType, userId, idLawan, connRecv.socket.getOutputStream()).setVisible(true);
-                } catch (IOException ex) {
-                    Logger.getLogger(InitPage.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                ChatRoom chatRoom = new ChatRoom(newChat, chatType, userId, idLawan, connSend);
+                newChat.addObserver(chatRoom);
+                chatRoom.setVisible(true);
             }
         }).start();
-        
+
     }//GEN-LAST:event_jButtonLoginActionPerformed
 
 

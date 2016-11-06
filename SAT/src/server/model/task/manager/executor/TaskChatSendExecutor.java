@@ -75,7 +75,6 @@ public class TaskChatSendExecutor extends TaskExecutor {
                             bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                             bufferedWriter.write(chatSend.toString());
                             bufferedWriter.flush();
-                            bufferedWriter.close();
                         }
                     }
                 } else {

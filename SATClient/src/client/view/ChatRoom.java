@@ -5,6 +5,7 @@
  */
 package client.view;
 
+import client.model.ConnectionSender;
 import client.model.clientData.Chat;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -33,15 +34,15 @@ public class ChatRoom extends javax.swing.JFrame implements Observer, Runnable {
     private ChatType chatType;
     private String userId;
     private String idLawan;
-    private BufferedWriter bufferedWriter;
+    private ConnectionSender connSend;
 
-    public ChatRoom(Chat chats, ChatType chatType, String userId, String idLawan, OutputStream outputStream) {
+    public ChatRoom(Chat chats, ChatType chatType, String userId, String idLawan, ConnectionSender connSend) {
         initComponents();
         this.chats = chats;
         this.chatType = chatType;
         this.userId = userId;
         this.idLawan = idLawan;
-        bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+        this.connSend= connSend;
         System.out.println(toString());
     }
 
@@ -50,9 +51,6 @@ public class ChatRoom extends javax.swing.JFrame implements Observer, Runnable {
         return "ChatRoom{" + "chats=" + chats + ", chatType=" + chatType + ", userId=" + userId + ", idLawan=" + idLawan + ", jTextFieldChatInput=" + jTextFieldChatInput.getText() + '}';
     }
 
-    public void setOutputStream(OutputStream outputStream) {
-        bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -119,19 +117,14 @@ public class ChatRoom extends javax.swing.JFrame implements Observer, Runnable {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonSendChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendChatActionPerformed
-        try {
-            System.out.println(toString());
-            long currentTime = System.currentTimeMillis();
-            Date currentDate = new Date(currentTime);
-            PacketChatSend newPacketChatSend = new PacketChatSend(PacketType.CHAT_SEND, 0, SourceType.CLIENT, chatType, userId, this.idLawan, this.jTextFieldChatInput.getText(), JDBCMySQLManager.DATE_FORMAT.format(currentDate));
-            this.chats.addSelfChat(newPacketChatSend.chat, currentTime);
-            System.out.println("Sending packet : " + newPacketChatSend.toString());
-            System.out.println("body data : " + newPacketChatSend.getBodyData());
-            bufferedWriter.write(newPacketChatSend.toString());
-            bufferedWriter.flush();
-        } catch (IOException ex) {
-            JOptionPane.showConfirmDialog(null, "Send Chat Failed", "Send Error", JOptionPane.NO_OPTION, JOptionPane.ERROR_MESSAGE);
-        }
+        System.out.println(toString());
+        long currentTime = System.currentTimeMillis();
+        Date currentDate = new Date(currentTime);
+        PacketChatSend newPacketChatSend = new PacketChatSend(PacketType.CHAT_SEND, 0, SourceType.CLIENT, chatType, userId, this.idLawan, this.jTextFieldChatInput.getText(), JDBCMySQLManager.DATE_FORMAT.format(currentDate));
+        this.chats.addSelfChat(newPacketChatSend.chat, currentTime);
+        System.out.println("Sending packet : " + newPacketChatSend.toString());
+        System.out.println("body data : " + newPacketChatSend.getBodyData());
+        connSend.addPacket(newPacketChatSend); 
     }//GEN-LAST:event_jButtonSendChatActionPerformed
 
 

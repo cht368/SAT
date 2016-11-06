@@ -95,11 +95,13 @@ public class ConnectionManager implements Runnable {
                     if (this.connectedSockets.size() <= LIMIT_CONNECTION) {
                         bw.write("Welcome to this server \n");
                         bw.write("Connection Started\n");
+                        bw.flush();
                         createConnection(clientSocket);
                     } else {
                         //TODO Masih belum beres
                         bw.write("Sorry, the server is full please try another server \n");
                         bw.write(this.serverList.get(0) + "\n");
+                        bw.flush();
                     }
                 } else if (type.equals("1")) {
                     //server
