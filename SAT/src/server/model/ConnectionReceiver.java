@@ -45,6 +45,7 @@ public class ConnectionReceiver implements Runnable {
             try {
                 String input = inputReader.readLine();
                 Packet packet = PacketFactory.createPacketFromString(input);
+                System.out.println("Packet Builded :" + packet.toString());
                 packetQueue.add(packet);
             } catch (IOException ex) {
                 Logger.getLogger(ConnectionReceiver.class.getName()).log(Level.SEVERE, null, ex);

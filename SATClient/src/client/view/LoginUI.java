@@ -7,10 +7,13 @@ package client.view;
 
 import client.model.ConnectionReceiver;
 import client.model.ConnectionSender;
+import client.model.clientData.Chat;
+import client.model.clientData.PrivateChat;
 import client.model.clientData.User;
 import java.util.Observable;
 import java.util.Observer;
 import javax.swing.JOptionPane;
+import server.model.packet.ChatType;
 import server.model.packet.PacketLoginClient;
 import server.model.packet.PacketType;
 import server.model.packet.SourceType;
@@ -148,11 +151,26 @@ public class LoginUI extends javax.swing.JPanel implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         User user = (User) o;
-        this.jButtonBack.setEnabled(false);
-        this.jButtonLogin.setEnabled(false);
-        this.jButtonRegister.setEnabled(false);
+        this.jButtonBack.setEnabled(true);
+        this.jButtonLogin.setEnabled(true);
+        this.jButtonRegister.setEnabled(true);
         if (user.isAuthenticated()) {
-            this.gui.setMainPanelTo(new HomePage(gui,connRecv,connSend));
+            String idLawan = JOptionPane.showInputDialog(null, "Input ID", "Input ID", JOptionPane.QUESTION_MESSAGE);
+
+            ChatType chatType = ChatType.PRIVATE;
+            Chat newChat = new PrivateChat(idLawan);
+            this.connRecv.chatRoomsData.put(idLawan, newChat);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    ChatRoom chatRoom = new ChatRoom(newChat, chatType, jTextFieldID.getText(), idLawan, connSend);
+                    newChat.addObserver(chatRoom);
+                    chatRoom.setVisible(true);
+                }
+            }).start();
+//            HomePage newHomePage = new HomePage(gui,connRecv,connSend);
+//            this.connRecv.addObserver(newHomePage);
+//            this.gui.setMainPanelTo(newHomePage);
         } else {
             JOptionPane.showConfirmDialog(null, "username and password didn't match", "Not Authenticated", JOptionPane.NO_OPTION, JOptionPane.WARNING_MESSAGE);
         }

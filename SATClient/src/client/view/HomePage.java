@@ -9,6 +9,9 @@ import client.model.ConnectionReceiver;
 import client.model.ConnectionSender;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
@@ -22,7 +25,7 @@ import server.model.packet.SourceType;
  *
  * @author ASUS A455LF
  */
-public class HomePage extends javax.swing.JPanel {
+public class HomePage extends javax.swing.JPanel implements Observer{
 
     GraphicalUI gui;
     ConnectionReceiver connRecv;
@@ -45,9 +48,20 @@ public class HomePage extends javax.swing.JPanel {
         this.connRecv = connRecv;
         this.connSend = connSend;
     }
+    public void resetFriendList(){
+        
+        panelFriendListDimension = new Dimension(450, 0);
+        this.jPanelFriendList.removeAll();
+        jPanelFriendList.setLayout(new BoxLayout(jPanelFriendList, BoxLayout.PAGE_AXIS));
+        this.jPanelFriendList.setPreferredSize(panelFriendListDimension);
+        this.jPanelFriendList.repaint();
+    }
 
     public void addNewFriendList(String id) {
+        panelFriendListDimension.setSize(panelFriendListDimension.getWidth(), panelFriendListDimension.getHeight() + 46);
         this.jPanelFriendList.add(new EntityUI(connRecv, connSend, ChatType.PRIVATE, id));
+        this.jPanelFriendList.setPreferredSize(panelFriendListDimension);
+        this.jPanelFriendList.repaint();
     }
 
     /**
@@ -143,6 +157,11 @@ public class HomePage extends javax.swing.JPanel {
         });
 
         jButton3.setText("REFRESH");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -176,6 +195,14 @@ public class HomePage extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        PacketGetOnlineClient requestOnlineClient = new PacketGetOnlineClient(PacketType.GET_ONLINE_CLIENT,
+                0,
+                SourceType.CLIENT,
+                connRecv.socket.getLocalSocketAddress().toString().substring(1));
+        connSend.addPacket(requestOnlineClient);
+    }//GEN-LAST:event_jButton3ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -191,4 +218,12 @@ public class HomePage extends javax.swing.JPanel {
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void update(Observable o, Object arg) {
+        
+        for (int i = 0; i < connRecv.onlineIds.size(); i++) {
+            addNewFriendList(connRecv.onlineIds.get(i));
+        }
+    }
 }

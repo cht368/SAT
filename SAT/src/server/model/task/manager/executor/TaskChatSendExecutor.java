@@ -83,7 +83,7 @@ public class TaskChatSendExecutor extends TaskExecutor {
                 }
             }
             dbManager.close();
-            stop();
+//            stop();
         } catch (Exception ex) {
             Logger.getLogger(TaskChatSendExecutor.class.getName()).log(Level.SEVERE, null, ex);
         }

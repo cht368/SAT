@@ -81,6 +81,7 @@ public class JDBCMySQLManager {
 
     public void updateIpAddressUser(String id, String ip_address) throws SQLException {
         String sql = "UPDATE `user_sat` SET `ip_address_port` = '" + ip_address + "' WHERE `user_sat`.`id` = '"+id+"'";
+        System.out.println("Executing Query = " + sql);
         stmt.executeUpdate(sql);
     }
 
@@ -116,6 +117,7 @@ public class JDBCMySQLManager {
 
     public void updateStatusUser(String id,String status) throws SQLException {
         String sql = "UPDATE `user_sat` SET `current_status` ='"+status+"' WHERE `user_sat`.`id` = '"+id+"'";
+        System.out.println("Executing Query = " + sql);
         stmt.executeUpdate(sql);
     }
 }

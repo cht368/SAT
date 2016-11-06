@@ -44,8 +44,8 @@ public class TaskLoginExecutor extends TaskExecutor {
             PacketLoginResponse loginResponse;
             if ((userPassword != null || !userPassword.equals("")) && packetLogin.password.equals(userPassword)) {
                 String username = dbManager.getUsernameUser(packetLogin.id);
-                dbManager.updateIpAddressUser(username, packetLogin.ipAddress);
-                dbManager.updateStatusUser(username,"online");
+                dbManager.updateIpAddressUser(packetLogin.id, packetLogin.ipAddress);
+                dbManager.updateStatusUser(packetLogin.id,"online");
                 loginResponse = new PacketLoginResponse(PacketType.LOGIN_RESPONSE, connectedSockets.size(), SourceType.SERVER, LoginResponseType.PROCEED, username);
                 bufferedWriter.write(loginResponse.toString());
                 bufferedWriter.flush();
@@ -57,14 +57,12 @@ public class TaskLoginExecutor extends TaskExecutor {
                 bufferedWriter.flush();
 
             }
-            stop();
+//            stop();
         } catch (SQLException ex) {
             Logger.getLogger(TaskLoginExecutor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(TaskLoginExecutor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(TaskLoginExecutor.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
             Logger.getLogger(TaskLoginExecutor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

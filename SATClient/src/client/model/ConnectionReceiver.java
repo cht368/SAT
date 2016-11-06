@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.text.ParseException;
+import java.util.Observable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,7 +33,7 @@ import server.model.packet.PacketLoginResponse;
  *
  * @author Ega Prianto
  */
-public class ConnectionReceiver implements Runnable {
+public class ConnectionReceiver extends Observable implements Runnable {
 
     public int port;
     public String ip;
@@ -74,37 +75,43 @@ public class ConnectionReceiver implements Runnable {
                 String receivedMsg = br.readLine();
 //                System.out.println("Received Packet : "+receivedMsg);
                 Packet receivedPacket = PacketFactory.createPacketFromString(receivedMsg);
+                System.out.println("Packet Builded :" + receivedPacket.toString());
                 switch (receivedPacket.command) {
                     case CHAT_SEND:
-                        PacketChatSend chatReceived = (PacketChatSend) receivedPacket;
-                        if (chatReceived.chatType == ChatType.PRIVATE) {
-                            PrivateChat chatRoomData = (PrivateChat) this.chatRoomsData.get(chatReceived.idPengirim);
-                            chatRoomData.addOpponentChat(chatReceived.chat, JDBCMySQLManager.DATE_FORMAT.parse(chatReceived.timestamp).getTime());
+                        if (receivedPacket instanceof PacketChatSend) {
+                            PacketChatSend chatReceived = (PacketChatSend) receivedPacket;
+                            if (chatReceived.chatType == ChatType.PRIVATE) {
+                                PrivateChat chatRoomData = (PrivateChat) this.chatRoomsData.get(chatReceived.idPengirim);
+                                chatRoomData.addOpponentChat(chatReceived.chat, JDBCMySQLManager.DATE_FORMAT.parse(chatReceived.timestamp).getTime());
+                            };
                         }
                     case LOGIN_RESPONSE:
-                        PacketLoginResponse loginResponseReceived = (PacketLoginResponse) receivedPacket;
-                        switch (loginResponseReceived.response) {
-                            case FORBIDDEN:
-                                this.user.get().setAuthenticated(false);
-                            case PROCEED:
-                                this.user.get().setUsername(loginResponseReceived.username);
-                                this.user.get().setAuthenticated(true);
+                        if (receivedPacket instanceof PacketLoginResponse) {
+                            PacketLoginResponse loginResponseReceived = (PacketLoginResponse) receivedPacket;
+                            switch (loginResponseReceived.response) {
+                                case FORBIDDEN:
+                                    this.user.get().setAuthenticated(false);
+                                case PROCEED:
+                                    this.user.get().setUsername(loginResponseReceived.username);
+                                    this.user.get().setAuthenticated(true);
+                            };
                         }
-                        ;
                     case GET_ONLINE_SERVER:
-                        PacketGetOnlineServer getOnlineServer = (PacketGetOnlineServer) receivedPacket;
-                        this.onlineIds.clear();
-                        this.onlineIds.addAll(getOnlineServer.listID);
+                        if (receivedPacket instanceof PacketGetOnlineServer) {
+                            PacketGetOnlineServer getOnlineServer = (PacketGetOnlineServer) receivedPacket;
+                            this.onlineIds.clear();
+                            this.onlineIds.addAll(getOnlineServer.listID);
+                            clearChanged();
+                            notifyObservers();
+                        }
                 }
             }
-            stop();
+//            stop();
         } catch (IOException ex) {
             Logger.getLogger(ConnectionReceiver.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParseException ex) {
             Logger.getLogger(ConnectionReceiver.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ConnectionReceiver.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
     }
 
     public void start() {
