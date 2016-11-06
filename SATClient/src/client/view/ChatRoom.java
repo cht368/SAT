@@ -7,10 +7,14 @@ package client.view;
 
 import client.model.clientData.Chat;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import server.model.packet.ChatType;
 import server.model.packet.PacketChatSend;
 import server.model.packet.PacketType;
@@ -106,7 +110,14 @@ public class ChatRoom extends javax.swing.JFrame implements Observer {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonSendChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendChatActionPerformed
-        PacketChatSend newPacketChatSend = new PacketChatSend(PacketType.CHAT_SEND, 0, SourceType.CLIENT, chatType, userId, this.idLawan, this.jTextFieldChatInput.getText());
+        try {
+            PacketChatSend newPacketChatSend = new PacketChatSend(PacketType.CHAT_SEND, 0, SourceType.CLIENT, chatType, userId, this.idLawan, this.jTextFieldChatInput.getText());
+            this.chats.addSelfChat(idLawan);
+            bufferedWriter.write(newPacketChatSend.toString());
+            bufferedWriter.flush();
+        } catch (IOException ex) {
+            JOptionPane.showConfirmDialog(null, "Send Chat Failed", "Send Error", JOptionPane.NO_OPTION, JOptionPane.ERROR_MESSAGE);
+        }
         
     }//GEN-LAST:event_jButtonSendChatActionPerformed
     /**

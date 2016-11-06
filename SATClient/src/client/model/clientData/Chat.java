@@ -11,9 +11,9 @@ import java.util.Observable;
  *
  * @author Ega Prianto
  */
-public class Chat extends Observable{
-    private StringBuilder chats;
-    private String withId;
+public abstract class Chat extends Observable{
+    protected StringBuilder chats;
+    protected String withId;
 
     public Chat(String withId) {
         this.withId = withId;
@@ -33,24 +33,13 @@ public class Chat extends Observable{
     public String getWithId() {
         return withId;
     }
-
-    public void setWithId(String withId) {
-        this.withId = withId;
-        setChanged();
-        notifyObservers();
-    }
-    
-    public void addOpponentChat(String newChat){
-        this.chats.append(this.withId);
-        addChat(newChat);
-    }
     
     public void addSelfChat(String newChat){
         this.chats.append("You");
         addChat(newChat);
     }
-    
-    private void addChat(String newChat){
+            
+    protected void addChat(String newChat){
         this.chats.append(" : ");
         this.chats.append(newChat);
         this.chats.append("\n");

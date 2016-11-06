@@ -7,6 +7,7 @@ package client.view;
 
 import client.model.ConnectionReceiver;
 import client.model.clientData.Chat;
+import client.model.clientData.PrivateChat;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -103,7 +104,7 @@ public class InitPage extends javax.swing.JPanel {
     private void jButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLoginActionPerformed
         try {
             String idLawan = "cete";
-            Chat newChat = new Chat(idLawan);
+            Chat newChat = new PrivateChat(idLawan);
             ChatRoom newChatRoom = new ChatRoom();
             newChat.addObserver(newChatRoom);
             this.connRecv.chatRoomsData.put(idLawan, newChat);
