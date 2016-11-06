@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +28,7 @@ public class JDBCMySQLManager {
 
     public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     public static final String DB_URL = "jdbc:mysql://localhost/sat";
-    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     //  Database credentials
     public static final String USER = "root";
     public static final String PASS = "";
@@ -40,8 +41,8 @@ public class JDBCMySQLManager {
         conn = DriverManager.getConnection(DB_URL, USER, PASS);
         stmt = conn.createStatement();
     }
-    
-    public void close() throws SQLException{
+
+    public void close() throws SQLException {
         this.conn.close();
         this.stmt.close();
     }
@@ -56,7 +57,7 @@ public class JDBCMySQLManager {
         preparedStatement.close();
     }
 
-    public void insertUser(String id, String id_server,String ip_address_port, String passwd, String prof_name, String public_key, String current_status) throws SQLException {
+    public void insertUser(String id, String id_server, String ip_address_port, String passwd, String prof_name, String public_key, String current_status) throws SQLException {
         PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO `user_sat` (`id`, `id_server`, `ip_address_port`, `passwd`, `prof_name`, `public_key`, `current_status`) VALUES (?, ?, ?, ?, ?, ?, ?)");
         preparedStatement.setString(1, id);
         preparedStatement.setString(2, id_server);
@@ -68,19 +69,53 @@ public class JDBCMySQLManager {
         preparedStatement.execute();
         preparedStatement.close();
     }
-    
-    public String getIpAddressPortUser(String id) throws SQLException{
-        String sql = "SELECT `ip_address_port` FROM `user_sat` WHERE `id`='"+id+"'";
+
+    public String getIpAddressPortUser(String id) throws SQLException {
+        String sql = "SELECT `ip_address_port` FROM `user_sat` WHERE `id`='" + id + "'";
         ResultSet rs = stmt.executeQuery(sql);
         rs.next();
         String result = rs.getString("ip_address_port");
         rs.close();
         return result;
     }
-    
+
     public void updateIpAddressUser(String id, String ip_address) throws SQLException {
-        String sql = "UPDATE `user_sat` SET `ip_address_port` = '"+ip_address+"' WHERE `user_sat`.`id` = 'egaprianto'" ; 
+        String sql = "UPDATE `user_sat` SET `ip_address_port` = '" + ip_address + "' WHERE `user_sat`.`id` = '"+id+"'";
         stmt.executeUpdate(sql);
     }
 
+    public String getPasswordUser(String id) throws SQLException {
+        String sql = "SELECT `passwd` FROM `user_sat` WHERE `id`='" + id + "'";
+        ResultSet rs = stmt.executeQuery(sql);
+        rs.next();
+        String result = rs.getString("passwd");
+        rs.close();
+        return result;
+    }
+
+    public String getUsernameUser(String id) throws SQLException {
+        String sql = "SELECT `prof_name` FROM `user_sat` WHERE `id`='" + id + "'";
+        ResultSet rs = stmt.executeQuery(sql);
+        rs.next();
+        String result = rs.getString("prof_name");
+        rs.close();
+        return result;
+    }
+
+    public ArrayList<String> getOnline() throws SQLException {
+        String sql = "SELECT `id`,`prof_name` FROM `user_sat` WHERE `current_status` = 'online'";
+        ResultSet rs = stmt.executeQuery(sql);
+        ArrayList<String> result = new ArrayList<>();
+        while (rs.next()) {
+            String id = rs.getString("id");
+            result.add(id);
+        }
+        rs.close();
+        return result;
+    }
+
+    public void updateStatusUser(String id,String status) throws SQLException {
+        String sql = "UPDATE `user_sat` SET `current_status` ='"+status+"' WHERE `user_sat`.`id` = '"+id+"'";
+        stmt.executeUpdate(sql);
+    }
 }

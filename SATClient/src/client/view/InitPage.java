@@ -57,6 +57,11 @@ public class InitPage extends javax.swing.JPanel {
 
         jButtonRegister.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jButtonRegister.setText("Register");
+        jButtonRegister.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRegisterActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Welcome to Server bla");
 
@@ -108,21 +113,29 @@ public class InitPage extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLoginActionPerformed
-        String idLawan = "cete";
-        userId = "egaprianto";
-        ChatType chatType = ChatType.PRIVATE;
-        Chat newChat = new PrivateChat(idLawan);
-        this.connRecv.chatRoomsData.put(idLawan, newChat);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ChatRoom chatRoom = new ChatRoom(newChat, chatType, userId, idLawan, connSend);
-                newChat.addObserver(chatRoom);
-                chatRoom.setVisible(true);
-            }
-        }).start();
-
+//        String idLawan = "cete";
+//        userId = "egaprianto";
+//        ChatType chatType = ChatType.PRIVATE;
+//        Chat newChat = new PrivateChat(idLawan);
+//        this.connRecv.chatRoomsData.put(idLawan, newChat);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                ChatRoom chatRoom = new ChatRoom(newChat, chatType, userId, idLawan, connSend);
+//                newChat.addObserver(chatRoom);
+//                chatRoom.setVisible(true);
+//            }
+//        }).start();
+        LoginUI loginUI = new LoginUI(gui,connRecv,connSend);
+        connRecv.user.get().addObserver(loginUI);
+        this.gui.setMainPanelTo(loginUI);
+        
     }//GEN-LAST:event_jButtonLoginActionPerformed
+
+    private void jButtonRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegisterActionPerformed
+        //TESTING need to be deleted
+        this.gui.setMainPanelTo(new HomePage(gui, connRecv, connSend));
+    }//GEN-LAST:event_jButtonRegisterActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

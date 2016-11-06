@@ -13,6 +13,8 @@ import server.model.packet.Packet;
 import server.model.packet.PacketChatSend;
 import server.model.task.manager.executor.TaskChatSendExecutor;
 import server.model.task.manager.executor.TaskExecutor;
+import server.model.task.manager.executor.TaskGetOnlineExecutor;
+import server.model.task.manager.executor.TaskLoginExecutor;
 
 /**
  *
@@ -43,6 +45,12 @@ public class TaskManager implements Runnable {
                     case CHAT_SEND:
                         System.out.println("Task Chat Send Assigned");
                         new TaskChatSendExecutor(connectedSockets, connectedServerSockets, newPacket).start();
+                    case GET_ONLINE_CLIENT:
+                        System.out.println("Task Get Online Client Assigned");
+                        new TaskGetOnlineExecutor(connectedSockets, connectedServerSockets, newPacket).start();
+                    case LOGIN_CLIENT:
+                        System.out.println("Task Login Client Assigned");
+                        new TaskLoginExecutor(connectedSockets, connectedServerSockets, newPacket).start();
                 }
             }
         }

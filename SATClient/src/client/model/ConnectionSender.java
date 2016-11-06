@@ -40,6 +40,7 @@ public class ConnectionSender implements Runnable {
             if (!listPacket.isEmpty()) {
                 try {
                     Packet toSend = listPacket.poll();
+                    System.out.println("Sending Packet : " + toSend.toString());
                     bw.write(toSend.toString());
                     bw.flush();
                 } catch (IOException ex) {

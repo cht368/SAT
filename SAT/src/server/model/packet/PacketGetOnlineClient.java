@@ -11,13 +11,16 @@ package server.model.packet;
  */
 public class PacketGetOnlineClient extends Packet {
 
-    public PacketGetOnlineClient(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType) {
+    public String ipAddressPort;
+    
+    public PacketGetOnlineClient(PacketType command, int serverLoad, SourceType sourceType, String ipAddressPort) {
         super(command, serverLoad, sourceType);
+        this.ipAddressPort = ipAddressPort;
     }
 
     @Override
     public String getBodyData() {
-        return "";
+        return ipAddressPort;
     }
 
 }

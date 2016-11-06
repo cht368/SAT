@@ -5,19 +5,49 @@
  */
 package client.view;
 
+import client.model.ConnectionReceiver;
+import client.model.ConnectionSender;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JScrollPane;
+import javax.swing.Timer;
+import server.model.packet.ChatType;
+import server.model.packet.PacketGetOnlineClient;
+import server.model.packet.PacketType;
+import server.model.packet.SourceType;
+
 /**
  *
  * @author ASUS A455LF
  */
 public class HomePage extends javax.swing.JPanel {
-    /**
-     * Creates new form HomePage
-     */
-    public HomePage() {
+
+    GraphicalUI gui;
+    ConnectionReceiver connRecv;
+    ConnectionSender connSend;
+    Dimension panelFriendListDimension;
+
+    public HomePage(GraphicalUI gui, ConnectionReceiver connRecv, ConnectionSender connSend) {
         initComponents();
-        this.jPanel1 = new EntityList();
-        
-        this.jPanel2 = new EntityList();
+        panelFriendListDimension = new Dimension(450, 0);
+        jPanelFriendList.setLayout(new BoxLayout(jPanelFriendList, BoxLayout.PAGE_AXIS));
+        jScrollPaneFriendList.getVerticalScrollBar().setUnitIncrement(20);
+        this.jPanelFriendList.setPreferredSize(panelFriendListDimension);
+        this.jPanelFriendList.repaint();
+        PacketGetOnlineClient requestOnlineClient = new PacketGetOnlineClient(PacketType.GET_ONLINE_CLIENT,
+                0,
+                SourceType.CLIENT,
+                connRecv.socket.getLocalSocketAddress().toString().substring(1));
+        connSend.addPacket(requestOnlineClient);
+        this.gui = gui;
+        this.connRecv = connRecv;
+        this.connSend = connSend;
+    }
+
+    public void addNewFriendList(String id) {
+        this.jPanelFriendList.add(new EntityUI(connRecv, connSend, ChatType.PRIVATE, id));
     }
 
     /**
@@ -30,40 +60,44 @@ public class HomePage extends javax.swing.JPanel {
     private void initComponents() {
 
         jTabbedPane5 = new javax.swing.JTabbedPane();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
+        jPanelFriendSubFrame = new javax.swing.JPanel();
+        jScrollPaneFriendList = new javax.swing.JScrollPane();
+        jPanelFriendList = new javax.swing.JPanel();
+        jPanelGroupList = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jTextField1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 475, Short.MAX_VALUE)
+        jPanelFriendList.setToolTipText("");
+        jPanelFriendList.setPreferredSize(new java.awt.Dimension(453, 200));
+        jPanelFriendList.setLayout(new javax.swing.BoxLayout(jPanelFriendList, javax.swing.BoxLayout.LINE_AXIS));
+        jScrollPaneFriendList.setViewportView(jPanelFriendList);
+
+        javax.swing.GroupLayout jPanelFriendSubFrameLayout = new javax.swing.GroupLayout(jPanelFriendSubFrame);
+        jPanelFriendSubFrame.setLayout(jPanelFriendSubFrameLayout);
+        jPanelFriendSubFrameLayout.setHorizontalGroup(
+            jPanelFriendSubFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelFriendSubFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPaneFriendList)
+                .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 444, Short.MAX_VALUE)
+        jPanelFriendSubFrameLayout.setVerticalGroup(
+            jPanelFriendSubFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelFriendSubFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPaneFriendList, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
-        jTabbedPane5.addTab("Friend", jPanel1);
+        jTabbedPane5.addTab("Friend", jPanelFriendSubFrame);
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 475, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 444, Short.MAX_VALUE)
-        );
-
-        jTabbedPane5.addTab("Group", jPanel2);
+        jPanelGroupList.setLayout(new javax.swing.BoxLayout(jPanelGroupList, javax.swing.BoxLayout.LINE_AXIS));
+        jTabbedPane5.addTab("Group", jPanelGroupList);
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
@@ -95,7 +129,7 @@ public class HomePage extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jTextField1)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -108,6 +142,8 @@ public class HomePage extends javax.swing.JPanel {
             }
         });
 
+        jButton3.setText("REFRESH");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -118,6 +154,8 @@ public class HomePage extends javax.swing.JPanel {
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
         );
@@ -125,10 +163,12 @@ public class HomePage extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
+                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 472, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jTabbedPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 423, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -140,10 +180,13 @@ public class HomePage extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanelFriendList;
+    private javax.swing.JPanel jPanelFriendSubFrame;
+    private javax.swing.JPanel jPanelGroupList;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPaneFriendList;
     private javax.swing.JTabbedPane jTabbedPane5;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;

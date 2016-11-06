@@ -18,6 +18,7 @@ import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 import server.model.db.JDBCMySQLManager;
 import server.model.packet.ChatType;
 import server.model.packet.PacketChatSend;
@@ -29,7 +30,7 @@ import server.model.packet.SourceType;
  * @author ASUS A455LF
  */
 public class ChatRoom extends javax.swing.JFrame implements Observer, Runnable {
-
+    
     private Chat chats;
     private ChatType chatType;
     private String userId;
@@ -44,6 +45,8 @@ public class ChatRoom extends javax.swing.JFrame implements Observer, Runnable {
         this.idLawan = idLawan;
         this.connSend= connSend;
         System.out.println(toString());
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        
     }
 
     @Override
