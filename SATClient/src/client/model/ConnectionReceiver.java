@@ -24,7 +24,7 @@ public class ConnectionReceiver implements Runnable {
 
     public int port;
     public String ip;
-    private Socket socket;
+    public Socket socket;
     private Thread thread;
     private boolean isFinish;
     public static String MOTD;
@@ -35,9 +35,10 @@ public class ConnectionReceiver implements Runnable {
         this.port = port;
         this.ip = ip;
         socket = new Socket(ip, port);
+        this.chatRoomsData = new ConcurrentHashMap<>();
         br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
-
+    
     @Override
     public void run() {
         try {

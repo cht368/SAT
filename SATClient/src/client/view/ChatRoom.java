@@ -6,14 +6,30 @@
 package client.view;
 
 import client.model.clientData.Chat;
+import java.io.BufferedWriter;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Observable;
 import java.util.Observer;
+import server.model.packet.ChatType;
+import server.model.packet.PacketChatSend;
+import server.model.packet.PacketType;
+import server.model.packet.SourceType;
 
 /**
  *
  * @author ASUS A455LF
  */
 public class ChatRoom extends javax.swing.JFrame implements Observer {
+
+    public Chat chats;
+    public ChatType chatType;
+    public String userId;
+    public String idLawan;
+    private BufferedWriter bufferedWriter;
+    
+
+    
 
     /**
      * Creates new form ChatRoom
@@ -22,6 +38,9 @@ public class ChatRoom extends javax.swing.JFrame implements Observer {
         initComponents();
     }
 
+    public void setOutputStream(OutputStream outputStream){
+        bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -32,19 +51,25 @@ public class ChatRoom extends javax.swing.JFrame implements Observer {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        jTextAreaChatArea = new javax.swing.JTextArea();
+        jTextFieldChatInput = new javax.swing.JTextField();
+        jButtonSendChat = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        jTextAreaChatArea.setColumns(20);
+        jTextAreaChatArea.setRows(5);
+        jScrollPane1.setViewportView(jTextAreaChatArea);
 
-        jTextField1.setText("insert text here");
+        jButtonSendChat.setText("SEND");
+        jButtonSendChat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonSendChatActionPerformed(evt);
+            }
+        });
 
-        jButton1.setText("SEND");
+        jLabel1.setText("Insert Chat Below");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -54,10 +79,13 @@ public class ChatRoom extends javax.swing.JFrame implements Observer {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 366, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jTextFieldChatInput, javax.swing.GroupLayout.PREFERRED_SIZE, 366, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1))
+                        .addComponent(jButtonSendChat, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -65,16 +93,22 @@ public class ChatRoom extends javax.swing.JFrame implements Observer {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTextField1)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 77, Short.MAX_VALUE))
+                    .addComponent(jButtonSendChat, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
+                    .addComponent(jTextFieldChatInput))
                 .addContainerGap(29, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButtonSendChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendChatActionPerformed
+        PacketChatSend newPacketChatSend = new PacketChatSend(PacketType.CHAT_SEND, 0, SourceType.CLIENT, chatType, userId, this.idLawan, this.jTextFieldChatInput.getText());
+        
+    }//GEN-LAST:event_jButtonSendChatActionPerformed
     /**
      * @param args the command line arguments
      */
@@ -111,15 +145,16 @@ public class ChatRoom extends javax.swing.JFrame implements Observer {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButtonSendChat;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextArea jTextAreaChatArea;
+    private javax.swing.JTextField jTextFieldChatInput;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void update(Observable o, Object arg) {
-        Chat update = (Chat) o; 
-        
+        Chat update = (Chat) o;
+        this.jTextAreaChatArea.setText(update.toString());
     }
 }

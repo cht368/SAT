@@ -7,6 +7,11 @@ package client.view;
 
 import client.model.ConnectionReceiver;
 import client.model.clientData.Chat;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import server.model.packet.ChatType;
 
 /**
  *
@@ -15,6 +20,7 @@ import client.model.clientData.Chat;
 public class InitPage extends javax.swing.JPanel {
     GraphicalUI gui;
     ConnectionReceiver connRecv;
+    String userId;
     
     /**
      * Creates new form Lobby
@@ -95,12 +101,20 @@ public class InitPage extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLoginActionPerformed
-        String id_lawan = "cete";
-        Chat newChat = new Chat(id_lawan);
-        ChatRoom newChatRoom = new ChatRoom();
-        newChat.addObserver(newChatRoom);
-        this.connRecv.chatRoomsData.put(id_lawan, newChat);
-        newChatRoom.setVisible(true);
+        try {
+            String idLawan = "cete";
+            Chat newChat = new Chat(idLawan);
+            ChatRoom newChatRoom = new ChatRoom();
+            newChat.addObserver(newChatRoom);
+            this.connRecv.chatRoomsData.put(idLawan, newChat);
+            newChatRoom.chats = newChat;
+            newChatRoom.idLawan = idLawan;
+            newChatRoom.chatType = ChatType.PRIVATE;
+            newChatRoom.setOutputStream(connRecv.socket.getOutputStream());
+            newChatRoom.setVisible(true);
+        } catch (IOException ex) {
+            JOptionPane.showConfirmDialog(null, "Could not connect to the server", "Connection Error", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_jButtonLoginActionPerformed
 
 
