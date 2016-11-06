@@ -8,7 +8,7 @@ package server.model.task.manager.executor;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import model.packet.Packet;
+import server.model.packet.Packet;
 
 /**
  *
