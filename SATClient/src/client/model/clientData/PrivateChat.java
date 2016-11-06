@@ -15,9 +15,9 @@ public class PrivateChat extends Chat {
         super(withId);
     }
     
-    public void addOpponentChat(String newChat){
+    public void addOpponentChat(String newChat,long timestamp){
         this.chats.append(this.withId);
-        addChat(newChat);
+        addChat(newChat,timestamp);
     }
     
 }

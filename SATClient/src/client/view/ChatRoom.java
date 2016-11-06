@@ -111,14 +111,13 @@ public class ChatRoom extends javax.swing.JFrame implements Observer {
 
     private void jButtonSendChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendChatActionPerformed
         try {
-            PacketChatSend newPacketChatSend = new PacketChatSend(PacketType.CHAT_SEND, 0, SourceType.CLIENT, chatType, userId, this.idLawan, this.jTextFieldChatInput.getText());
-            this.chats.addSelfChat(idLawan);
+            PacketChatSend newPacketChatSend = new PacketChatSend(PacketType.CHAT_SEND, 0, SourceType.CLIENT, chatType, userId, this.idLawan, this.jTextFieldChatInput.getText(), System.currentTimeMillis());
+            this.chats.addSelfChat(newPacketChatSend.chat,newPacketChatSend.timestamp);
             bufferedWriter.write(newPacketChatSend.toString());
             bufferedWriter.flush();
         } catch (IOException ex) {
             JOptionPane.showConfirmDialog(null, "Send Chat Failed", "Send Error", JOptionPane.NO_OPTION, JOptionPane.ERROR_MESSAGE);
         }
-        
     }//GEN-LAST:event_jButtonSendChatActionPerformed
     /**
      * @param args the command line arguments

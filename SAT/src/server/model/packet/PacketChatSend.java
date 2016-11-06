@@ -15,18 +15,20 @@ public class PacketChatSend extends Packet {
     public String idPengirim;
     public String idPenerima;
     public String chat;
+    public long timestamp;
 
-    public PacketChatSend(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String idPengirim, String idPenerima, String chat) {
+    public PacketChatSend(PacketType command, int serverLoad, SourceType sourceType, ChatType chatType, String idPengirim, String idPenerima, String chat,long timestamp) {
         super(command, serverLoad, sourceType);
         this.chatType=chatType;
         this.idPenerima=idPenerima;
         this.idPengirim=idPengirim;
         this.chat= chat;
+        this.timestamp=timestamp;
     }
 
     @Override
     public String getBodyData() {
-            return chatType + ";" + idPengirim + ";" + idPenerima + ";" + chat;
+            return chatType + ";" + idPengirim + ";" + idPenerima + ";" + chat+ ";"+timestamp;
     }
 
 }

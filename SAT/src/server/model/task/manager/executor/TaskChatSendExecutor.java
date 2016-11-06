@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import server.model.db.JDBCManager;
+import server.model.db.JDBCMySQLManager;
 import server.model.packet.ChatType;
 import server.model.packet.Packet;
 import server.model.packet.PacketChatSend;
@@ -27,6 +27,8 @@ import server.model.packet.SourceType;
  */
 public class TaskChatSendExecutor extends TaskExecutor {
 
+    private JDBCMySQLManager dbManager;
+
     public TaskChatSendExecutor(ConcurrentHashMap<String, Socket> connectedSockets, CopyOnWriteArrayList<Socket> connectedServerSockets, Packet packet) {
         super(connectedSockets, connectedServerSockets, packet);
     }
@@ -34,8 +36,8 @@ public class TaskChatSendExecutor extends TaskExecutor {
     @Override
     public void run() {
         try {
+            dbManager = new JDBCMySQLManager();
             PacketChatSend receivedPacket = (PacketChatSend) this.packet;
-            JDBCManager jdbcManager = new JDBCManager();
             BufferedWriter bufferedWriter;
             PacketChatSend chatSend = new PacketChatSend(receivedPacket.command,
                     this.connectedSockets.size(),
@@ -43,11 +45,13 @@ public class TaskChatSendExecutor extends TaskExecutor {
                     receivedPacket.chatType,
                     receivedPacket.idPengirim,
                     receivedPacket.idPenerima,
-                    receivedPacket.chat);
+                    receivedPacket.chat,
+                    receivedPacket.timestamp
+            );
             if (receivedPacket.chatType == ChatType.GROUP) {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             } else {
-                //Masukkan data ke database
+                dbManager.insertChat(receivedPacket.idPengirim, receivedPacket.idPenerima, receivedPacket.chat, receivedPacket.timestamp);
                 int a;
                 if (receivedPacket.chatType == ChatType.BROADCAST) {
                     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -63,7 +67,7 @@ public class TaskChatSendExecutor extends TaskExecutor {
                             bufferedWriter.close();
                         }*/
                         //cari ipnya dl d database
-                        String ipAddressPenerima = "";
+                        String ipAddressPenerima = dbManager.getIpAddressPortUser(receivedPacket.idPenerima);
                         if (connectedSockets.containsKey(ipAddressPenerima)) {
                             Socket clientSocket = connectedSockets.get(ipAddressPenerima);
                             bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
@@ -77,6 +81,7 @@ public class TaskChatSendExecutor extends TaskExecutor {
                     throw new UnsupportedOperationException("Not supported yet.");
                 }
             }
+            dbManager.close();
         } catch (Exception ex) {
             Logger.getLogger(TaskChatSendExecutor.class.getName()).log(Level.SEVERE, null, ex);
         }

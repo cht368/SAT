@@ -21,7 +21,7 @@ public class PacketFactory {
             case CHAT_SEND:
                 return new PacketChatSend(packetType, Integer.parseInt(splitted[1]),
                         SourceType.valueOf(splitted[2]), ChatType.valueOf(splitted[3]),
-                        splitted[4], splitted[5], splitted[6]);
+                        splitted[4], splitted[5], splitted[6],Long.parseLong(splitted[7]));
             case CREATE_GROUP:
                 for (int i = 5; i < splitted.length; i++) {
                     listID.add(splitted[i]);
@@ -39,7 +39,7 @@ public class PacketFactory {
                 }
                 return new PacketGetOnlineServer(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), listID);
             case LOGIN_CLIENT:
-                return new PacketLoginClient(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3], splitted[4]);
+                return new PacketLoginClient(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3], splitted[4],splitted[5]);
             case LOGIN_SERVER:
                 return new PacketLoginServer(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3]);
             case LOGOUT:

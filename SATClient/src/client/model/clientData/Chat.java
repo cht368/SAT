@@ -5,6 +5,9 @@
  */
 package client.model.clientData;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Observable;
 
 /**
@@ -34,14 +37,18 @@ public abstract class Chat extends Observable{
         return withId;
     }
     
-    public void addSelfChat(String newChat){
+    public void addSelfChat(String newChat,long timestamp){
         this.chats.append("You");
-        addChat(newChat);
+        addChat(newChat,timestamp);
     }
             
-    protected void addChat(String newChat){
+    protected void addChat(String newChat, long timestamp){
+        Date date = new Date(timestamp);
+        DateFormat df = new SimpleDateFormat("HH:mm");
         this.chats.append(" : ");
         this.chats.append(newChat);
+        this.chats.append("     ");
+        this.chats.append(df.format(date));
         this.chats.append("\n");
         setChanged();
         notifyObservers();

@@ -12,17 +12,19 @@ package server.model.packet;
 public class PacketLoginClient extends Packet {
 
     public String id;
+    public String ipAddress;
     public String password;
 
-    public PacketLoginClient(PacketType command, int serverLoad, SourceType sourceType, String id, String password) {
+    public PacketLoginClient(PacketType command, int serverLoad, SourceType sourceType, String id, String ipAddress, String password) {
         super(command, serverLoad, sourceType);
         this.id=id;
+        this.ipAddress = ipAddress;
         this.password=password;
     }
 
     @Override
     public String getBodyData() {
-        return id + ";"+password;
+        return id+ ";"+ipAddress + ";"+password;
     }
 
 }
