@@ -43,12 +43,14 @@ public class TaskGetOnlineExecutor extends TaskExecutor{
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             bufferedWriter.write(toSend.toString());
             bufferedWriter.flush();
-//            stop();
+            this.thread.join();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(TaskGetOnlineExecutor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(TaskGetOnlineExecutor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            Logger.getLogger(TaskGetOnlineExecutor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(TaskGetOnlineExecutor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

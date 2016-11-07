@@ -57,12 +57,14 @@ public class TaskLoginExecutor extends TaskExecutor {
                 bufferedWriter.flush();
 
             }
-//            stop();
+            this.thread.join();
         } catch (SQLException ex) {
             Logger.getLogger(TaskLoginExecutor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(TaskLoginExecutor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            Logger.getLogger(TaskLoginExecutor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(TaskLoginExecutor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

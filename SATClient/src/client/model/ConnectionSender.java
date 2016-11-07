@@ -22,21 +22,21 @@ public class ConnectionSender implements Runnable {
     private Thread thread;
     private boolean isFinish;
     private ConcurrentLinkedQueue<Packet> listPacket;
-    
+
     public ConnectionSender(BufferedWriter bw) {
         this.bw = bw;
         this.thread = new Thread(this);
         this.isFinish = false;
         this.listPacket = new ConcurrentLinkedQueue<>();
     }
-    
-    public void addPacket(Packet packet){
+
+    public void addPacket(Packet packet) {
         listPacket.add(packet);
     }
-    
+
     @Override
     public void run() {
-        while (!isFinish) {            
+        while (!isFinish) {
             if (!listPacket.isEmpty()) {
                 try {
                     Packet toSend = listPacket.poll();
@@ -46,7 +46,7 @@ public class ConnectionSender implements Runnable {
                 } catch (IOException ex) {
                     Logger.getLogger(ConnectionSender.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
+
             }
         }
     }
@@ -60,6 +60,4 @@ public class ConnectionSender implements Runnable {
         this.isFinish = true;
         this.thread.join();
     }
-
-    
 }

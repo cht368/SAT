@@ -106,7 +106,6 @@ public class ConnectionReceiver extends Observable implements Runnable {
                         }
                 }
             }
-//            stop();
         } catch (IOException ex) {
             Logger.getLogger(ConnectionReceiver.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParseException ex) {
