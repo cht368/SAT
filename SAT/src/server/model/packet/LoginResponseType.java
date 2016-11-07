@@ -5,23 +5,11 @@
  */
 package server.model.packet;
 
-
 /**
  *
  * @author Ega Prianto
  */
-public enum PacketType {
-    CHAT_SEND,
-    CREATE_GROUP,
-    GET_CHAT_CLIENT,
-    GET_CHAT_SERVER,
-    GET_KEY,
-    GET_ONLINE_SERVER,
-    GET_ONLINE_CLIENT,
-    KEY,
-    LOGIN_SERVER,
-    LOGIN_RESPONSE,
-    LOGIN_CLIENT,
-    LOGOUT,
-    REGISTER
+public enum LoginResponseType {
+    FORBIDDEN,
+    PROCEED
 }

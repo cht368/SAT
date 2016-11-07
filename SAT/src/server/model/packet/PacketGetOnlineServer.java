@@ -13,21 +13,24 @@ import java.util.ArrayList;
  */
 public class PacketGetOnlineServer extends Packet {
 
-    public ArrayList<String>listID;
+    public ArrayList<String> listID;
 
     public PacketGetOnlineServer(PacketType command, int serverLoad, SourceType sourceType, ArrayList<String> listID) {
         super(command, serverLoad, sourceType);
-        this.listID=listID;
+        this.listID = listID;
     }
 
     @Override
     public String getBodyData() {
-        String hasil="";
-        for (int i = 0; i < listID.size()-1; i++) {
-            hasil+=listID.get(i)+";";
+        String hasil = "";
+        for (int i = 0; i < listID.size(); i++) {
+            hasil += listID.get(i) + ";";
         }
-        hasil+=listID.get(listID.size()-1);
-        return hasil;
+        if (listID.size() == 0) {
+            return "";
+        } else {
+            return hasil.substring(0, hasil.length() - 1);
+        }
     }
 
 }

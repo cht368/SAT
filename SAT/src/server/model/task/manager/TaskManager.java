@@ -11,8 +11,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import server.model.packet.Packet;
 import server.model.packet.PacketChatSend;
+import server.model.packet.PacketGetOnlineClient;
+import server.model.packet.PacketLoginClient;
 import server.model.task.manager.executor.TaskChatSendExecutor;
 import server.model.task.manager.executor.TaskExecutor;
+import server.model.task.manager.executor.TaskGetOnlineExecutor;
+import server.model.task.manager.executor.TaskLoginExecutor;
 
 /**
  *
@@ -38,9 +42,23 @@ public class TaskManager implements Runnable {
         while (!isFinish) {
             if (!packetQueue.isEmpty()) {
                 Packet newPacket = packetQueue.poll();
+                System.out.println("Assign Task");
                 switch (newPacket.command) {
                     case CHAT_SEND:
-                        new TaskChatSendExecutor(connectedSockets, connectedServerSockets, newPacket).start();
+                        if (newPacket instanceof PacketChatSend) {
+                            System.out.println("Task Chat Send Assigned");
+                            new TaskChatSendExecutor(connectedSockets, connectedServerSockets, newPacket).start();
+                        }
+                    case GET_ONLINE_CLIENT:
+                        if (newPacket instanceof PacketGetOnlineClient) {
+                            System.out.println("Task Get Online Client Assigned");
+                            new TaskGetOnlineExecutor(connectedSockets, connectedServerSockets, newPacket).start();
+                        }
+                    case LOGIN_CLIENT:
+                        if (newPacket instanceof PacketLoginClient) {
+                            System.out.println("Task Login Client Assigned");
+                            new TaskLoginExecutor(connectedSockets, connectedServerSockets, newPacket).start();
+                        }
                 }
             }
         }

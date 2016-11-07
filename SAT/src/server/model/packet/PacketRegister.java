@@ -13,16 +13,18 @@ public class PacketRegister extends Packet {
 
     public String id;
     public String password;
+    public String name;
 
-    public PacketRegister(PacketType command, int serverLoad, SourceType sourceType, String id, String password) {
+    public PacketRegister(PacketType command, int serverLoad, SourceType sourceType, String id, String password, String name) {
         super(command, serverLoad, sourceType);
-        this.id=id;
-        this.password=password;
+        this.id = id;
+        this.password = password;
+        this.name = name;
     }
 
     @Override
     public String getBodyData() {
-        return id + ";"+password;
+        return id + ";" + password + ";" + name;
     }
 
 }

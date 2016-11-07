@@ -5,17 +5,30 @@
  */
 package client.view;
 
+import client.model.ConnectionReceiver;
+import client.model.ConnectionSender;
+import client.model.clientData.Chat;
+import client.model.clientData.PrivateChat;
+import server.model.packet.ChatType;
+
 /**
  *
  * @author ASUS A455LF
  */
 public class EntityUI extends javax.swing.JPanel {
 
-    /**
-     * Creates new form FriendUI
-     */
-    public EntityUI() {
+    public ChatType chatType;
+    public String idLawan;
+    public ConnectionReceiver connRecv;
+    public ConnectionSender connSend;
+
+    public EntityUI(ConnectionReceiver connRecv, ConnectionSender connSend, ChatType chatType, String idLawan) {
         initComponents();
+        this.chatType = chatType;
+        this.idLawan = idLawan;
+        this.connRecv = connRecv;
+        this.connSend = connSend;
+        this.jLabelID.setText(idLawan);
     }
 
     /**
@@ -27,15 +40,15 @@ public class EntityUI extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        jLabelID = new javax.swing.JLabel();
+        jButtonChat = new javax.swing.JButton();
 
-        jLabel1.setText("Friend Name ");
+        jLabelID.setText("Friend Name ");
 
-        jButton1.setText("CHAT");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButtonChat.setText("CHAT");
+        jButtonChat.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButtonChatActionPerformed(evt);
             }
         });
 
@@ -45,9 +58,9 @@ public class EntityUI extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                .addComponent(jLabelID, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addComponent(jButtonChat)
                 .addGap(18, 18, 18))
         );
         layout.setVerticalGroup(
@@ -55,19 +68,34 @@ public class EntityUI extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jButton1))
+                    .addComponent(jLabelID)
+                    .addComponent(jButtonChat))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void jButtonChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChatActionPerformed
+        Chat newChat;
+        if (chatType == ChatType.PRIVATE) {
+            newChat = new PrivateChat(idLawan);
+        } else {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        this.connRecv.chatRoomsData.put(idLawan, newChat);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ChatRoom chatRoom = new ChatRoom(newChat, chatType, connRecv.user.get().getId(), idLawan, connSend);
+                newChat.addObserver(chatRoom);
+                chatRoom.setVisible(true);
+            }
+        }).start();
+    }//GEN-LAST:event_jButtonChatActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton jButtonChat;
+    private javax.swing.JLabel jLabelID;
     // End of variables declaration//GEN-END:variables
 }

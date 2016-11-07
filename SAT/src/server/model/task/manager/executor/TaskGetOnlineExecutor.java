@@ -5,10 +5,22 @@
  */
 package server.model.task.manager.executor;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import server.model.db.JDBCMySQLManager;
 import server.model.packet.Packet;
+import server.model.packet.PacketGetOnlineClient;
+import server.model.packet.PacketGetOnlineServer;
+import server.model.packet.PacketType;
+import server.model.packet.SourceType;
 
 /**
  *
@@ -22,8 +34,25 @@ public class TaskGetOnlineExecutor extends TaskExecutor{
 
     @Override
     public void run() {
-        //TODO ambil data user yang sedang online dari database
-        // TODO kirim daftar user yang sedang online ke client
+        try {
+            PacketGetOnlineClient receivedPacket = (PacketGetOnlineClient) packet;
+            JDBCMySQLManager dbManager = new JDBCMySQLManager();
+            ArrayList<String> ids = dbManager.getOnline();
+            PacketGetOnlineServer toSend = new PacketGetOnlineServer(PacketType.GET_ONLINE_SERVER, connectedSockets.size(), SourceType.SERVER, ids);
+            Socket socket = connectedSockets.get(receivedPacket.ipAddressPort);
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            bufferedWriter.write(toSend.toString());
+            bufferedWriter.flush();
+            this.thread.join();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(TaskGetOnlineExecutor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(TaskGetOnlineExecutor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TaskGetOnlineExecutor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TaskGetOnlineExecutor.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }

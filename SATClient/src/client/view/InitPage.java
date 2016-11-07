@@ -6,8 +6,12 @@
 package client.view;
 
 import client.model.ConnectionReceiver;
+import client.model.ConnectionSender;
 import client.model.clientData.Chat;
+import client.model.clientData.PrivateChat;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -18,18 +22,21 @@ import server.model.packet.ChatType;
  * @author Ega Prianto
  */
 public class InitPage extends javax.swing.JPanel {
+
     GraphicalUI gui;
     ConnectionReceiver connRecv;
+    ConnectionSender connSend;
     String userId;
-    
+
     /**
      * Creates new form Lobby
      */
-
-    InitPage(GraphicalUI gui, ConnectionReceiver connRecv) {
+    public InitPage(GraphicalUI gui, ConnectionReceiver connRecv) throws IOException {
         initComponents();
         this.gui = gui;
         this.connRecv = connRecv;
+        this.connSend = new ConnectionSender(new BufferedWriter(new OutputStreamWriter(connRecv.socket.getOutputStream())));
+        this.connSend.start();
     }
 
     /**
@@ -50,6 +57,11 @@ public class InitPage extends javax.swing.JPanel {
 
         jButtonRegister.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jButtonRegister.setText("Register");
+        jButtonRegister.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRegisterActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Welcome to Server bla");
 
@@ -101,21 +113,29 @@ public class InitPage extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLoginActionPerformed
-        try {
-            String idLawan = "cete";
-            Chat newChat = new Chat(idLawan);
-            ChatRoom newChatRoom = new ChatRoom();
-            newChat.addObserver(newChatRoom);
-            this.connRecv.chatRoomsData.put(idLawan, newChat);
-            newChatRoom.chats = newChat;
-            newChatRoom.idLawan = idLawan;
-            newChatRoom.chatType = ChatType.PRIVATE;
-            newChatRoom.setOutputStream(connRecv.socket.getOutputStream());
-            newChatRoom.setVisible(true);
-        } catch (IOException ex) {
-            JOptionPane.showConfirmDialog(null, "Could not connect to the server", "Connection Error", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
-        }
+//        String idLawan = "cete";
+//        userId = "egaprianto";
+//        ChatType chatType = ChatType.PRIVATE;
+//        Chat newChat = new PrivateChat(idLawan);
+//        this.connRecv.chatRoomsData.put(idLawan, newChat);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                ChatRoom chatRoom = new ChatRoom(newChat, chatType, userId, idLawan, connSend);
+//                newChat.addObserver(chatRoom);
+//                chatRoom.setVisible(true);
+//            }
+//        }).start();
+        LoginUI loginUI = new LoginUI(gui,connRecv,connSend);
+        connRecv.user.get().addObserver(loginUI);
+        this.gui.setMainPanelTo(loginUI);
+        
     }//GEN-LAST:event_jButtonLoginActionPerformed
+
+    private void jButtonRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegisterActionPerformed
+        //TESTING need to be deleted
+        this.gui.setMainPanelTo(new HomePage(gui, connRecv, connSend));
+    }//GEN-LAST:event_jButtonRegisterActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
