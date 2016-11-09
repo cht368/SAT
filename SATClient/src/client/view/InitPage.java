@@ -31,12 +31,11 @@ public class InitPage extends javax.swing.JPanel {
     /**
      * Creates new form Lobby
      */
-    public InitPage(GraphicalUI gui, ConnectionReceiver connRecv) throws IOException {
+    public InitPage(GraphicalUI gui, ConnectionReceiver connRecv,ConnectionSender connSend) throws IOException {
         initComponents();
         this.gui = gui;
         this.connRecv = connRecv;
-        this.connSend = new ConnectionSender(new BufferedWriter(new OutputStreamWriter(connRecv.socket.getOutputStream())));
-        this.connSend.start();
+        this.connSend = connSend;
     }
 
     /**

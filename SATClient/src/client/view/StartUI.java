@@ -10,6 +10,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import client.model.ConnectionReceiver;
+import client.model.ConnectionSender;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 
 /**
  *
@@ -99,7 +102,10 @@ public class StartUI extends javax.swing.JPanel {
             int port = Integer.parseInt(this.jTextFieldPort.getText());
             ConnectionReceiver connRecv = new ConnectionReceiver(ipAddress, port);
             connRecv.start();
-            this.gui.setMainPanelTo(new InitPage(this.gui, connRecv));
+            ConnectionSender connSend = new ConnectionSender(new BufferedWriter(new OutputStreamWriter(connRecv.socket.getOutputStream())));
+            connSend.start();
+            connRecv.setConnSend(connSend);
+            this.gui.setMainPanelTo(new InitPage(this.gui, connRecv,connSend));
 //        } catch (IOException ex) {
 //            JOptionPane.showConfirmDialog(null, "Could not connect to the server", "Connection Error", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
         } catch (NumberFormatException ex) {

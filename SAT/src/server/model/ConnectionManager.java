@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -23,7 +24,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import server.controller.ChatServerController;
 import server.model.packet.Packet;
+import server.model.packet.PacketFactory;
+import server.model.packet.PacketGotOnline;
+import server.model.packet.PacketType;
+import server.model.packet.SourceType;
+import server.view.ConsoleUI;
 
 /**
  *
@@ -31,13 +38,13 @@ import server.model.packet.Packet;
  */
 public class ConnectionManager implements Runnable {
 
-    public static final int PORT = 2406;
+    public static int PORT = 2406;
 
     public ServerSocket serverSocket;
     public static final int LIMIT_CONNECTION = 10;
     private Thread thread;
     private boolean isFinish;
-    private List<String> serverList;
+    private CopyOnWriteArrayList<String> serverList;
     private ConcurrentHashMap<String, Socket> connectedSockets;
     private CopyOnWriteArrayList<Socket> connectedServerSockets;
     private CopyOnWriteArrayList<ConnectionReceiver> connectionReceivers;
@@ -56,14 +63,21 @@ public class ConnectionManager implements Runnable {
         this.packetQueue = packetQueue;
         this.connectedServerSockets = connectedServerSockets;
         this.connectedSockets = connectedSockets;
+        this.PORT = customPort;
         this.serverSocket = new ServerSocket(customPort);
     }
 
     private void init() {
+        try {
+            this.serverList = new CopyOnWriteArrayList<String>();
+            this.serverList.addAll(ChatServerController.dbManager.getAllIpAddressServerExcept(ConsoleUI.idServer));
+            System.out.println("This is Server List : " + serverList);
+        } catch (SQLException ex) {
+            Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.thread = new Thread(this);
         this.isFinish = false;
         this.connectionReceivers = new CopyOnWriteArrayList<>();
-        this.serverList = new ArrayList<>();
     }
 
     public void createConnection(Socket socket) throws IOException, ClassNotFoundException, SQLException {
@@ -73,24 +87,60 @@ public class ConnectionManager implements Runnable {
         newConnection.start();
     }
 
+    public void createServerConnection(String ipAddress, int port) throws IOException, ClassNotFoundException, SQLException {
+        boolean isExist = false;
+        for (int i = 0; i < connectedServerSockets.size(); i++) {
+            if (connectedServerSockets.get(i).getRemoteSocketAddress().toString().substring(1).equals(ipAddress + ":" + port)) {
+                isExist = true;
+                break;
+            }
+        }
+        if (!isExist) {
+            Socket serverSocket = new Socket(ipAddress, port);
+            Packet packet = new PacketGotOnline(PacketType.GOT_ONLINE, this.connectedSockets.size(), SourceType.SERVER, ConsoleUI.idServer, serverSocket.getLocalAddress().toString().substring(1), PORT);
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(serverSocket.getOutputStream()));
+            System.out.println("Sending packet to server : " + packet.toString());
+            bufferedWriter.write(packet.toString());
+            bufferedWriter.flush();
+            System.out.println("Adding server to socket");
+            this.connectedServerSockets.add(serverSocket);//adding server socket connection
+        }
+    }
+
+    public void createServerConnectionReceiver(Socket socket) throws IOException, ClassNotFoundException, SQLException {
+        ConnectionReceiver newConnection = new ConnectionReceiver(socket, this.packetQueue);
+        this.connectionReceivers.add(newConnection);
+        newConnection.start();
+    }
+
     @Override
     public void run() {
         System.out.println("Listening started on port: " + serverSocket.getLocalPort());
-        try {/*broadcast ke semua server
+        try {
             for (String string : serverList) {
                 String[] splitted = string.split(":");
-                Socket serverSocket = new Socket(splitted[0], Integer.parseInt(splitted[1]));
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(serverSocket.getOutputStream()));
-                bufferedWriter.write("1\n");
-                this.connectedServerSockets.add(serverSocket);
-            }*/
+                int port = Integer.parseInt(splitted[1]);
+                try {
+                    Socket serverSocket = new Socket(splitted[0], port);
+                    Packet packet = new PacketGotOnline(PacketType.GOT_ONLINE, this.connectedSockets.size(), SourceType.SERVER, ConsoleUI.idServer, serverSocket.getLocalAddress().toString().substring(1), PORT);
+                    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(serverSocket.getOutputStream()));
+                    System.out.println("Sending packet to server : " + packet.toString());
+                    bufferedWriter.write(packet.toString());
+                    bufferedWriter.flush();
+                    System.out.println("Adding server to socket");
+                    this.connectedServerSockets.add(serverSocket);//adding server socket connection
+                } catch (ConnectException ex) {
+                    //not connected do nothing
+                }
+            }
             while (!isFinish) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Accepted connection host: " + clientSocket.getRemoteSocketAddress().toString().substring(1));
                 BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 String type = br.readLine();
                 BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-                if (type.equals("0")) {
+                PacketGotOnline packetGotOnline = (PacketGotOnline) PacketFactory.createPacketFromString(type);
+                if (packetGotOnline.sourceType == SourceType.CLIENT) {
                     //client
                     if (this.connectedSockets.size() <= LIMIT_CONNECTION) {
                         bw.write("Welcome to this server \n");
@@ -103,9 +153,12 @@ public class ConnectionManager implements Runnable {
                         bw.write(this.serverList.get(0) + "\n");
                         bw.flush();
                     }
-                } else if (type.equals("1")) {
+                } else if (packetGotOnline.sourceType == SourceType.SERVER) {
                     //server
-                    this.connectedServerSockets.add(clientSocket);//adding server socket connection
+                    System.out.println("Server Connected " + packetGotOnline.id + " at " + packetGotOnline.ipAddress + " : " + packetGotOnline.toString());
+                    createServerConnection(packetGotOnline.ipAddress, packetGotOnline.port);
+                    createServerConnectionReceiver(clientSocket);
+                    ChatServerController.dbManager.insertServer(packetGotOnline.id, packetGotOnline.ipAddress, packetGotOnline.port);
                 } else {
                     clientSocket.close();
                     //command wrong close connection

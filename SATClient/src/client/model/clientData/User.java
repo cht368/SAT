@@ -21,6 +21,7 @@ public class User extends Observable {
     }
 
     public void setAuthenticated(boolean authenticated) {
+        System.out.println("ada yang ngubah");
         this.authenticated = authenticated;
         setChanged();
         notifyObservers();

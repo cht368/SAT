@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import server.controller.ChatServerController;
 import server.model.db.JDBCMySQLManager;
 import server.model.packet.Packet;
 import server.model.packet.PacketGetOnlineClient;
@@ -26,7 +27,7 @@ import server.model.packet.SourceType;
  *
  * @author Ega Prianto
  */
-public class TaskGetOnlineExecutor extends TaskExecutor{
+public class TaskGetOnlineExecutor extends TaskExecutor {
 
     public TaskGetOnlineExecutor(ConcurrentHashMap<String, Socket> connectedSockets, CopyOnWriteArrayList<Socket> connectedServerSockets, Packet packet) {
         super(connectedSockets, connectedServerSockets, packet);
@@ -36,16 +37,14 @@ public class TaskGetOnlineExecutor extends TaskExecutor{
     public void run() {
         try {
             PacketGetOnlineClient receivedPacket = (PacketGetOnlineClient) packet;
-            JDBCMySQLManager dbManager = new JDBCMySQLManager();
-            ArrayList<String> ids = dbManager.getOnline();
+            ArrayList<String> ids = ChatServerController.dbManager.getOnlineExcept(receivedPacket.id);
             PacketGetOnlineServer toSend = new PacketGetOnlineServer(PacketType.GET_ONLINE_SERVER, connectedSockets.size(), SourceType.SERVER, ids);
             Socket socket = connectedSockets.get(receivedPacket.ipAddressPort);
+            System.out.print("Sending packet Online : " + toSend.toString());
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             bufferedWriter.write(toSend.toString());
             bufferedWriter.flush();
             this.thread.join();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(TaskGetOnlineExecutor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(TaskGetOnlineExecutor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -54,5 +53,5 @@ public class TaskGetOnlineExecutor extends TaskExecutor{
             Logger.getLogger(TaskGetOnlineExecutor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
 }

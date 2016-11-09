@@ -75,22 +75,15 @@ public class EntityUI extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChatActionPerformed
+        
         Chat newChat;
         if (chatType == ChatType.PRIVATE) {
             newChat = new PrivateChat(idLawan);
         } else {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
-
         this.connRecv.chatRoomsData.put(idLawan, newChat);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ChatRoom chatRoom = new ChatRoom(newChat, chatType, connRecv.user.get().getId(), idLawan, connSend);
-                newChat.addObserver(chatRoom);
-                chatRoom.setVisible(true);
-            }
-        }).start();
+        ChatRoom.popChatWindow(newChat, chatType, connRecv.user.get().getId(), idLawan, connSend,connRecv);
     }//GEN-LAST:event_jButtonChatActionPerformed
 
 

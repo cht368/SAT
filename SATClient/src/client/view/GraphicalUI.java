@@ -5,6 +5,8 @@
  */
 package client.view;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import javax.swing.JPanel;
 
 /**
@@ -13,6 +15,7 @@ import javax.swing.JPanel;
  */
 public class GraphicalUI extends javax.swing.JFrame {
 
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     /**
      * Creates new form GraphicalUI
      */

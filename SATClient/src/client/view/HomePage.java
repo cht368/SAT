@@ -7,6 +7,7 @@ package client.view;
 
 import client.model.ConnectionReceiver;
 import client.model.ConnectionSender;
+import client.model.clientData.Home;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class HomePage extends javax.swing.JPanel implements Observer{
         PacketGetOnlineClient requestOnlineClient = new PacketGetOnlineClient(PacketType.GET_ONLINE_CLIENT,
                 0,
                 SourceType.CLIENT,
+                connRecv.user.get().getId(),
                 connRecv.socket.getLocalSocketAddress().toString().substring(1));
         connSend.addPacket(requestOnlineClient);
         this.gui = gui;
@@ -49,7 +51,6 @@ public class HomePage extends javax.swing.JPanel implements Observer{
         this.connSend = connSend;
     }
     public void resetFriendList(){
-        
         panelFriendListDimension = new Dimension(450, 0);
         this.jPanelFriendList.removeAll();
         jPanelFriendList.setLayout(new BoxLayout(jPanelFriendList, BoxLayout.PAGE_AXIS));
@@ -199,6 +200,7 @@ public class HomePage extends javax.swing.JPanel implements Observer{
         PacketGetOnlineClient requestOnlineClient = new PacketGetOnlineClient(PacketType.GET_ONLINE_CLIENT,
                 0,
                 SourceType.CLIENT,
+                connRecv.user.get().getId(),
                 connRecv.socket.getLocalSocketAddress().toString().substring(1));
         connSend.addPacket(requestOnlineClient);
     }//GEN-LAST:event_jButton3ActionPerformed
@@ -221,9 +223,10 @@ public class HomePage extends javax.swing.JPanel implements Observer{
 
     @Override
     public void update(Observable o, Object arg) {
-        
-        for (int i = 0; i < connRecv.onlineIds.size(); i++) {
-            addNewFriendList(connRecv.onlineIds.get(i));
+        Home update = (Home) o;
+        resetFriendList();
+        for (int i = 0; i < update.getOnlineIds().size(); i++) {
+            addNewFriendList(update.getOnlineIds().get(i));
         }
     }
 }
