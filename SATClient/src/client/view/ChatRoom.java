@@ -49,6 +49,7 @@ public class ChatRoom extends javax.swing.JFrame implements Observer, Runnable {
         System.out.println(toString());
         this.connRecv = connRecv;
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.jTextAreaChatArea.setEditable(false);
         this.jTextAreaChatArea.setText(chats.toString());
         /*Some piece of code*/
         this.addWindowListener(new java.awt.event.WindowAdapter() {

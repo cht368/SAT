@@ -157,6 +157,7 @@ public class LoginUI extends javax.swing.JPanel implements Observer {
             HomePage newHomePage = new HomePage(gui, connRecv, connSend);
             this.connRecv.home.get().addObserver(newHomePage);
             this.gui.setMainPanelTo(newHomePage);
+            this.connRecv.user.get().deleteObservers();
         } else {
             System.out.println("harusnya " + user.isAuthenticated());
             JOptionPane.showConfirmDialog(null, "username and password didn't match", "Not Authenticated", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);

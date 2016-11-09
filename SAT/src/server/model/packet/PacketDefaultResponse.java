@@ -15,17 +15,15 @@ import server.model.db.JDBCMySQLManager;
 public class PacketDefaultResponse extends Packet {
 
     public String response;
-    public String ip_address_port;
 
-    public PacketDefaultResponse(PacketType command, int serverLoad, SourceType sourceType, String response, String ip_address_port) {
+    public PacketDefaultResponse(PacketType command, int serverLoad, SourceType sourceType, String response) {
         super(command, serverLoad, sourceType);
         this.response = response;
-        this.ip_address_port = ip_address_port;
     }
 
     @Override
     public String getBodyData() {
-        return response+";"+ip_address_port;
+        return response;
     }
 
 }

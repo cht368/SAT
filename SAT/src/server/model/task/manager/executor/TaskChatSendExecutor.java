@@ -61,7 +61,6 @@ public class TaskChatSendExecutor extends TaskExecutor {
                             bufferedWriter = new BufferedWriter(new OutputStreamWriter(connectedServerSocket.getOutputStream()));
                             bufferedWriter.write(chatSend.toString());
                             bufferedWriter.flush();
-                            bufferedWriter.close();
                         }
                     }
                     //mengirim ke semua client yang terhubung
@@ -69,7 +68,6 @@ public class TaskChatSendExecutor extends TaskExecutor {
                         bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                         bufferedWriter.write(chatSend.toString());
                         bufferedWriter.flush();
-                        bufferedWriter.close();
                     }
 
                 } else if (receivedPacket.chatType == ChatType.PRIVATE) {

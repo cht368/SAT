@@ -32,6 +32,8 @@ import server.model.packet.PacketFactory;
 import server.model.packet.PacketGetOnlineServer;
 import server.model.packet.PacketGotOnline;
 import server.model.packet.PacketLoginResponse;
+import server.model.packet.PacketLoginServer;
+import server.model.packet.PacketLogout;
 import server.model.packet.PacketType;
 import server.model.packet.SourceType;
 
@@ -75,8 +77,7 @@ public class ConnectionReceiver implements Runnable {
     @Override
     public void run() {
         try {
-            bw.write(new PacketGotOnline(PacketType.GOT_ONLINE, 0, SourceType.CLIENT, "", socket.getLocalAddress().toString()
-                    , socket.getLocalPort()).toString());
+            bw.write(new PacketGotOnline(PacketType.GOT_ONLINE, 0, SourceType.CLIENT, "", socket.getLocalAddress().toString(), socket.getLocalPort()).toString());
             bw.flush();
             MOTD = br.readLine() + " ";//"WELCOME TO SERVER
 
@@ -126,6 +127,19 @@ public class ConnectionReceiver implements Runnable {
                             this.home.get().addAllOnlineId(getOnlineServer.listID);
                         }
                         break;
+                    case LOGIN_SERVER:
+                        if (receivedPacket instanceof PacketLoginServer) {
+                            PacketLoginServer getLoginServer = (PacketLoginServer) receivedPacket;
+                            this.home.get().addOnlineId(getLoginServer.id);
+                        }
+                        break;
+                    case LOGOUT:
+                        if (receivedPacket instanceof PacketLogout) {
+                            PacketLogout getLogout = (PacketLogout) receivedPacket;
+                            this.home.get().removeOnlineId(getLogout.id);
+                        }
+                        break;
+                        
                 }
             }
         } catch (IOException ex) {

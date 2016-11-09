@@ -14,17 +14,19 @@ public class PacketRegister extends Packet {
     public String id;
     public String password;
     public String name;
+    public String ipAddressPort;
 
-    public PacketRegister(PacketType command, int serverLoad, SourceType sourceType, String id, String password, String name) {
+    public PacketRegister(PacketType command, int serverLoad, SourceType sourceType, String id, String password, String name,String ipAddressPort) {
         super(command, serverLoad, sourceType);
         this.id = id;
         this.password = password;
         this.name = name;
+        this.ipAddressPort = ipAddressPort;
     }
 
     @Override
     public String getBodyData() {
-        return id + ";" + password + ";" + name;
+        return id + ";" + password + ";" + name+ ";" + ipAddressPort;
     }
 
 }

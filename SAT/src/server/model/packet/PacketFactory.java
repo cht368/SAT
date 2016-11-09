@@ -30,7 +30,7 @@ public class PacketFactory {
                 return new PacketCreateGroup(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3], splitted[4], listID);
             case DEFAULT_RESPONSE:
                 return new PacketDefaultResponse(packetType,  Integer.parseInt(splitted[1]),
-                        SourceType.valueOf(splitted[2]), splitted[3],splitted[4]);
+                        SourceType.valueOf(splitted[2]), splitted[3]);
             case GET_CHAT_CLIENT:
                 return new PacketGetChatClient(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3], splitted[4], Long.parseLong(splitted[5]));
             case GET_CHAT_SERVER:
@@ -53,7 +53,7 @@ public class PacketFactory {
             case LOGOUT:
                 return new PacketLogout(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3]);
             case REGISTER:
-                return new PacketRegister(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3], splitted[4], splitted[5]);
+                return new PacketRegister(packetType, Integer.parseInt(splitted[1]), SourceType.valueOf(splitted[2]), splitted[3], splitted[4], splitted[5],splitted[6]);
         }
         return null;
     }

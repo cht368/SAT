@@ -16,10 +16,12 @@ import server.model.packet.PacketChatSend;
 import server.model.packet.PacketGetOnlineClient;
 import server.model.packet.PacketLoginClient;
 import server.model.packet.PacketLoginServer;
+import server.model.packet.PacketLogout;
 import server.model.task.manager.executor.TaskChatSendExecutor;
 import server.model.task.manager.executor.TaskExecutor;
 import server.model.task.manager.executor.TaskGetOnlineExecutor;
 import server.model.task.manager.executor.TaskLoginExecutor;
+import server.model.task.manager.executor.TaskLogoutExecutor;
 
 /**
  *
@@ -70,6 +72,12 @@ public class TaskManager implements Runnable {
                             if (newPacket instanceof PacketLoginServer) {
                                 System.out.println("Task Login Server Assigned");
                                 new TaskLoginExecutor(connectedSockets, connectedServerSockets, newPacket).start();
+                            }
+                            break;
+                        case LOGOUT:
+                            if (newPacket instanceof PacketLogout) {
+                                System.out.println("Task Logout Assigned");
+                                new TaskLogoutExecutor(connectedSockets, connectedServerSockets, newPacket).start();                                
                             }
                             break;
                     }
