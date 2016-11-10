@@ -5,24 +5,25 @@
  */
 package server.model.packet;
 
+import java.util.Date;
+import server.model.db.JDBCMySQLManager;
+
 /**
  *
  * @author Ega Prianto
  */
-public class PacketGetOnlineClient extends Packet {
-    
-    public String id;
-    public String ipAddressPort;
-    
-    public PacketGetOnlineClient(PacketType command, int serverLoad, SourceType sourceType,String id, String ipAddressPort) {
+public class PacketDefaultResponse extends Packet {
+
+    public String response;
+
+    public PacketDefaultResponse(PacketType command, int serverLoad, SourceType sourceType, String response) {
         super(command, serverLoad, sourceType);
-        this.id = id;
-        this.ipAddressPort = ipAddressPort;
+        this.response = response;
     }
 
     @Override
     public String getBodyData() {
-        return id+";"+ipAddressPort;
+        return response;
     }
 
 }

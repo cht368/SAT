@@ -5,6 +5,7 @@
  */
 package server.model.db;
 
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -17,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,25 +28,62 @@ import java.util.logging.Logger;
  */
 public class JDBCMySQLManager {
 
-    public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    public static final String DB_URL = "jdbc:mysql://localhost/sat";
+    public static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    public static String DB_URL;
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    //  Database credentials
-    public static final String USER = "root";
-    public static final String PASS = "";
+    public static String USER = "root";
+    public static String PASS = "";
 
     public Connection conn = null;
     public Statement stmt = null;
 
     public JDBCMySQLManager() throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.jdbc.Driver");
+        DB_URL = "jdbc:mysql://localhost/sat";
         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        stmt = conn.createStatement();
+    }
+
+    public JDBCMySQLManager(String DB_URL) throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.jdbc.Driver");
+        this.DB_URL = DB_URL;
+        conn = DriverManager.getConnection(this.DB_URL, USER, PASS);
         stmt = conn.createStatement();
     }
 
     public void close() throws SQLException {
         this.conn.close();
         this.stmt.close();
+    }
+
+    public String getIpAddressPortServer(String idServer) throws SQLException {
+        String sql = "SELECT `ip_address`,`port` FROM `server` WHERE `id` = '" + idServer + "'";
+        ResultSet rs = stmt.executeQuery(sql);
+        rs.next();
+        String result = rs.getString("ip_address") + ";" + rs.getInt("port");
+        rs.close();
+        return result;
+    }
+
+    public List<String> getAllIpAddressServer() throws SQLException {
+        String sql = "SELECT `ip_address`,`port` FROM `server`";
+        ResultSet rs = stmt.executeQuery(sql);
+        List<String> result = new ArrayList<>();
+        while (rs.next()) {
+            String getIpAddressPort = rs.getString("ip_address") + ":" + rs.getInt("port");
+            result.add(getIpAddressPort);
+        }
+        return result;
+    }
+    public List<String> getAllIpAddressServerExcept(String idServer) throws SQLException {
+        String sql = "SELECT `ip_address`,`port` FROM `server` WHERE `id` != '" + idServer + "'";
+        ResultSet rs = stmt.executeQuery(sql);
+        List<String> result = new ArrayList<>();
+        while (rs.next()) {
+            String getIpAddressPort = rs.getString("ip_address") + ":" + rs.getInt("port");
+            result.add(getIpAddressPort);
+        }
+        return result;
     }
 
     public void insertChat(String id_sender, String id_receiver, String chat, String date) throws SQLException, ParseException {
@@ -55,6 +94,20 @@ public class JDBCMySQLManager {
         preparedStatement.setString(4, date);
         preparedStatement.execute();
         preparedStatement.close();
+    }
+
+    public void insertServer(String idServer, String ip_address, int port) throws SQLException {
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO `server` (`id`, `ip_address`, `port`) VALUES (?, ?, ?)");
+            preparedStatement.setString(1, idServer);
+            preparedStatement.setString(2, ip_address);
+            preparedStatement.setInt(3, port);
+            preparedStatement.execute();
+            preparedStatement.close();
+        } catch (MySQLIntegrityConstraintViolationException ex) {
+            //idServerAlreadyExist
+            //do nothing
+        }
     }
 
     public void insertUser(String id, String id_server, String ip_address_port, String passwd, String prof_name, String public_key, String current_status) throws SQLException {
@@ -72,6 +125,8 @@ public class JDBCMySQLManager {
 
     public String getIpAddressPortUser(String id) throws SQLException {
         String sql = "SELECT `ip_address_port` FROM `user_sat` WHERE `id`='" + id + "'";
+        System.out.println("Print query ipAddress user :");
+        System.out.println(sql);
         ResultSet rs = stmt.executeQuery(sql);
         rs.next();
         String result = rs.getString("ip_address_port");
@@ -80,7 +135,13 @@ public class JDBCMySQLManager {
     }
 
     public void updateIpAddressUser(String id, String ip_address) throws SQLException {
-        String sql = "UPDATE `user_sat` SET `ip_address_port` = '" + ip_address + "' WHERE `user_sat`.`id` = '"+id+"'";
+        String sql = "UPDATE `user_sat` SET `ip_address_port` = '" + ip_address + "' WHERE `user_sat`.`id` = '" + id + "'";
+        System.out.println("Executing Query = " + sql);
+        stmt.executeUpdate(sql);
+    }
+    
+    public void updateServerUser(String id, String serverId) throws SQLException {
+        String sql = "UPDATE `user_sat` SET `id_server` = '" + serverId + "' WHERE `user_sat`.`id` = '" + id + "'";
         System.out.println("Executing Query = " + sql);
         stmt.executeUpdate(sql);
     }
@@ -96,6 +157,8 @@ public class JDBCMySQLManager {
 
     public String getUsernameUser(String id) throws SQLException {
         String sql = "SELECT `prof_name` FROM `user_sat` WHERE `id`='" + id + "'";
+        System.out.println("Print query get username :");
+        System.out.println(sql);
         ResultSet rs = stmt.executeQuery(sql);
         rs.next();
         String result = rs.getString("prof_name");
@@ -109,14 +172,29 @@ public class JDBCMySQLManager {
         ArrayList<String> result = new ArrayList<>();
         while (rs.next()) {
             String id = rs.getString("id");
+            System.out.println("Got Online Id : " + id);
             result.add(id);
         }
         rs.close();
         return result;
     }
 
-    public void updateStatusUser(String id,String status) throws SQLException {
-        String sql = "UPDATE `user_sat` SET `current_status` ='"+status+"' WHERE `user_sat`.`id` = '"+id+"'";
+    public ArrayList<String> getOnlineExcept(String id) throws SQLException {
+        String sql = "SELECT `id`,`prof_name` FROM `user_sat` WHERE `current_status` = 'online' and id !='" + id + "'";
+        System.out.println(sql);
+        ResultSet rs = stmt.executeQuery(sql);
+        ArrayList<String> result = new ArrayList<>();
+        while (rs.next()) {
+            String getId = rs.getString("id");
+            System.out.println("Got Online Id : " + getId);
+            result.add(getId);
+        }
+        rs.close();
+        return result;
+    }
+
+    public void updateStatusUser(String id, String status) throws SQLException {
+        String sql = "UPDATE `user_sat` SET `current_status` ='" + status + "' WHERE `user_sat`.`id` = '" + id + "'";
         System.out.println("Executing Query = " + sql);
         stmt.executeUpdate(sql);
     }

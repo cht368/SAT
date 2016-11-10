@@ -29,14 +29,12 @@ public class ConnectionReceiver implements Runnable {
     private BufferedReader inputReader;
     private boolean isFinish;
     private ConcurrentLinkedQueue<Packet> packetQueue;
-    private JDBCMySQLManager dbManager;
 
     public ConnectionReceiver(Socket socket, ConcurrentLinkedQueue<Packet> packetQueue) throws IOException, ClassNotFoundException, SQLException {
         this.socket = socket;
         inputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.thread = new Thread(this);
         this.packetQueue = packetQueue;
-        this.dbManager = new JDBCMySQLManager();
     }
 
     @Override

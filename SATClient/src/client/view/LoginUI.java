@@ -151,28 +151,19 @@ public class LoginUI extends javax.swing.JPanel implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         User user = (User) o;
+        if (user.isAuthenticated()) {
+            System.out.println("kok aneh" + user.isAuthenticated());
+            this.connRecv.user.get().setId(this.jTextFieldID.getText());
+            HomePage newHomePage = new HomePage(gui, connRecv, connSend);
+            this.connRecv.home.get().addObserver(newHomePage);
+            this.gui.setMainPanelTo(newHomePage);
+            this.connRecv.user.get().deleteObservers();
+        } else {
+            System.out.println("harusnya " + user.isAuthenticated());
+            JOptionPane.showConfirmDialog(null, "username and password didn't match", "Not Authenticated", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+        }
         this.jButtonBack.setEnabled(true);
         this.jButtonLogin.setEnabled(true);
         this.jButtonRegister.setEnabled(true);
-        if (user.isAuthenticated()) {
-            String idLawan = JOptionPane.showInputDialog(null, "Input ID", "Input ID", JOptionPane.QUESTION_MESSAGE);
-
-            ChatType chatType = ChatType.PRIVATE;
-            Chat newChat = new PrivateChat(idLawan);
-            this.connRecv.chatRoomsData.put(idLawan, newChat);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    ChatRoom chatRoom = new ChatRoom(newChat, chatType, jTextFieldID.getText(), idLawan, connSend);
-                    newChat.addObserver(chatRoom);
-                    chatRoom.setVisible(true);
-                }
-            }).start();
-//            HomePage newHomePage = new HomePage(gui,connRecv,connSend);
-//            this.connRecv.addObserver(newHomePage);
-//            this.gui.setMainPanelTo(newHomePage);
-        } else {
-            JOptionPane.showConfirmDialog(null, "username and password didn't match", "Not Authenticated", JOptionPane.NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        }
     }
 }

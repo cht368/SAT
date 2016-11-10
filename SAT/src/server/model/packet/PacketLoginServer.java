@@ -12,15 +12,17 @@ package server.model.packet;
 public class PacketLoginServer extends Packet {
 
     public String id;
+    public String ipAdressPort;
 
-    public PacketLoginServer(PacketType command, int serverLoad, SourceType sourceType, String id) {
+    public PacketLoginServer(PacketType command, int serverLoad, SourceType sourceType, String id, String ipAddressPort) {
         super(command, serverLoad, sourceType);
         this.id=id;
+        this.ipAdressPort = ipAddressPort;
     }
 
     @Override
     public String getBodyData() {
-        return id;
+        return id+";"+this.ipAdressPort;
     }
 
 }

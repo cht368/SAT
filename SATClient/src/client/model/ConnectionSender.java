@@ -46,7 +46,11 @@ public class ConnectionSender implements Runnable {
                 } catch (IOException ex) {
                     Logger.getLogger(ConnectionSender.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
+            }
+            try {
+                Thread.sleep(60);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ConnectionSender.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

@@ -9,20 +9,22 @@ package server.model.packet;
  *
  * @author Ega Prianto
  */
-public class PacketGetOnlineClient extends Packet {
-    
+public class PacketGotOnline extends Packet {
+
     public String id;
-    public String ipAddressPort;
-    
-    public PacketGetOnlineClient(PacketType command, int serverLoad, SourceType sourceType,String id, String ipAddressPort) {
+    public String ipAddress;
+    public int port;
+
+    public PacketGotOnline(PacketType command, int serverLoad, SourceType sourceType, String id, String ipAddress, int port) {
         super(command, serverLoad, sourceType);
         this.id = id;
-        this.ipAddressPort = ipAddressPort;
+        this.ipAddress = ipAddress;
+        this.port = port;
     }
 
     @Override
     public String getBodyData() {
-        return id+";"+ipAddressPort;
+        return id + ";" + ipAddress + ";" + port;
     }
 
 }

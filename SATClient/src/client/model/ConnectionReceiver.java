@@ -6,8 +6,11 @@
 package client.model;
 
 import client.model.clientData.Chat;
+import client.model.clientData.Home;
 import client.model.clientData.PrivateChat;
 import client.model.clientData.User;
+import client.view.ChatRoom;
+import client.view.GraphicalUI;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -21,19 +24,26 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import server.model.db.JDBCMySQLManager;
 import server.model.packet.ChatType;
 import server.model.packet.Packet;
 import server.model.packet.PacketChatSend;
+import server.model.packet.PacketDefaultResponse;
 import server.model.packet.PacketFactory;
 import server.model.packet.PacketGetOnlineServer;
+import server.model.packet.PacketGotOnline;
 import server.model.packet.PacketLoginResponse;
+import server.model.packet.PacketLoginServer;
+import server.model.packet.PacketLogout;
+import server.model.packet.PacketType;
+import server.model.packet.SourceType;
 
 /**
  *
  * @author Ega Prianto
  */
-public class ConnectionReceiver extends Observable implements Runnable {
+public class ConnectionReceiver implements Runnable {
 
     public int port;
     public String ip;
@@ -41,11 +51,17 @@ public class ConnectionReceiver extends Observable implements Runnable {
     private Thread thread;
     private boolean isFinish;
     public static String MOTD;
+    public ConnectionSender connSend;
+
     private BufferedReader br;
     private BufferedWriter bw;
     public ConcurrentHashMap<String, Chat> chatRoomsData;
-    public CopyOnWriteArrayList<String> onlineIds;
     public AtomicReference<User> user;
+    public AtomicReference<Home> home;
+
+    public void setConnSend(ConnectionSender connSend) {
+        this.connSend = connSend;
+    }
 
     public ConnectionReceiver(String ip, int port) throws IOException {
         this.thread = new Thread(this);
@@ -55,7 +71,7 @@ public class ConnectionReceiver extends Observable implements Runnable {
         System.out.println(socket.getLocalSocketAddress().toString());
         this.chatRoomsData = new ConcurrentHashMap<>();
         user = new AtomicReference<>(new User(null, null, false));
-        onlineIds = new CopyOnWriteArrayList<>();
+        home = new AtomicReference<>(new Home());
         br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
@@ -63,8 +79,7 @@ public class ConnectionReceiver extends Observable implements Runnable {
     @Override
     public void run() {
         try {
-            bw.write("0");
-            bw.newLine();
+            bw.write(new PacketGotOnline(PacketType.GOT_ONLINE, 0, SourceType.CLIENT, "", socket.getLocalAddress().toString(), socket.getLocalPort()).toString());
             bw.flush();
             MOTD = br.readLine() + " ";//"WELCOME TO SERVER
 
@@ -82,35 +97,64 @@ public class ConnectionReceiver extends Observable implements Runnable {
                             PacketChatSend chatReceived = (PacketChatSend) receivedPacket;
                             if (chatReceived.chatType == ChatType.PRIVATE) {
                                 PrivateChat chatRoomData = (PrivateChat) this.chatRoomsData.get(chatReceived.idPengirim);
-                                chatRoomData.addOpponentChat(chatReceived.chat, JDBCMySQLManager.DATE_FORMAT.parse(chatReceived.timestamp).getTime());
+                                if (chatRoomData == null) {
+                                    chatRoomData = new PrivateChat(chatReceived.idPengirim);
+                                    chatRoomData.addOpponentChat(chatReceived.chat, GraphicalUI.DATE_FORMAT.parse(chatReceived.timestamp).getTime());
+                                    this.chatRoomsData.put(chatReceived.idPengirim, chatRoomData);
+                                    ChatRoom.popChatWindow(chatRoomData, chatReceived.chatType, user.get().getId(), chatReceived.idPengirim, connSend, this);
+                                } else {
+                                    chatRoomData.addOpponentChat(chatReceived.chat, GraphicalUI.DATE_FORMAT.parse(chatReceived.timestamp).getTime());
+                                }
                             };
                         }
+                        break;
                     case LOGIN_RESPONSE:
                         if (receivedPacket instanceof PacketLoginResponse) {
                             PacketLoginResponse loginResponseReceived = (PacketLoginResponse) receivedPacket;
                             switch (loginResponseReceived.response) {
                                 case FORBIDDEN:
                                     this.user.get().setAuthenticated(false);
+                                    break;
                                 case PROCEED:
                                     this.user.get().setUsername(loginResponseReceived.username);
                                     this.user.get().setAuthenticated(true);
+                                    break;
                             };
                         }
+                        break;
                     case GET_ONLINE_SERVER:
                         if (receivedPacket instanceof PacketGetOnlineServer) {
                             PacketGetOnlineServer getOnlineServer = (PacketGetOnlineServer) receivedPacket;
-                            this.onlineIds.clear();
-                            this.onlineIds.addAll(getOnlineServer.listID);
-                            clearChanged();
-                            notifyObservers();
+                            this.home.get().clearOnlineId();
+                            this.home.get().addAllOnlineId(getOnlineServer.listID);
                         }
+                        break;
+                    case LOGIN_SERVER:
+                        if (receivedPacket instanceof PacketLoginServer) {
+                            PacketLoginServer getLoginServer = (PacketLoginServer) receivedPacket;
+                            this.home.get().addOnlineId(getLoginServer.id);
+                        }
+                        break;
+                    case LOGOUT:
+                        if (receivedPacket instanceof PacketLogout) {
+                            PacketLogout getLogout = (PacketLogout) receivedPacket;
+                            this.home.get().removeOnlineId(getLogout.id);
+                        }
+                        break;
+                    case DEFAULT_RESPONSE:
+                        if (receivedPacket instanceof PacketDefaultResponse) {
+                            PacketDefaultResponse getResponse = (PacketDefaultResponse) receivedPacket;
+                            JOptionPane.showConfirmDialog(null, getResponse.response, "Server Response", JOptionPane.NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                        }
+                        break;
+
                 }
             }
         } catch (IOException ex) {
             Logger.getLogger(ConnectionReceiver.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParseException ex) {
             Logger.getLogger(ConnectionReceiver.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        }
     }
 
     public void start() {

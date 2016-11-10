@@ -7,17 +7,23 @@ package client.view;
 
 import client.model.ConnectionReceiver;
 import client.model.ConnectionSender;
+import client.model.clientData.Home;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 import server.model.packet.ChatType;
 import server.model.packet.PacketGetOnlineClient;
+import server.model.packet.PacketLogout;
 import server.model.packet.PacketType;
 import server.model.packet.SourceType;
 
@@ -25,7 +31,7 @@ import server.model.packet.SourceType;
  *
  * @author ASUS A455LF
  */
-public class HomePage extends javax.swing.JPanel implements Observer{
+public class HomePage extends javax.swing.JPanel implements Observer {
 
     GraphicalUI gui;
     ConnectionReceiver connRecv;
@@ -39,17 +45,28 @@ public class HomePage extends javax.swing.JPanel implements Observer{
         jScrollPaneFriendList.getVerticalScrollBar().setUnitIncrement(20);
         this.jPanelFriendList.setPreferredSize(panelFriendListDimension);
         this.jPanelFriendList.repaint();
+        this.jTextAreaBroadcastChat.setEditable(false);
         PacketGetOnlineClient requestOnlineClient = new PacketGetOnlineClient(PacketType.GET_ONLINE_CLIENT,
                 0,
                 SourceType.CLIENT,
+                connRecv.user.get().getId(),
                 connRecv.socket.getLocalSocketAddress().toString().substring(1));
         connSend.addPacket(requestOnlineClient);
         this.gui = gui;
         this.connRecv = connRecv;
         this.connSend = connSend;
+        this.gui.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                PacketLogout packetLoggingout = new PacketLogout(PacketType.LOGOUT, 0, SourceType.CLIENT, connRecv.user.get().getId());
+                connSend.addPacket(packetLoggingout);
+                System.exit(0);
+
+            }
+        });
     }
-    public void resetFriendList(){
-        
+
+    public void resetFriendList() {
         panelFriendListDimension = new Dimension(450, 0);
         this.jPanelFriendList.removeAll();
         jPanelFriendList.setLayout(new BoxLayout(jPanelFriendList, BoxLayout.PAGE_AXIS));
@@ -80,11 +97,12 @@ public class HomePage extends javax.swing.JPanel implements Observer{
         jPanelGroupList = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jTextAreaBroadcastChat = new javax.swing.JTextArea();
         jTextField1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jButtonLogout = new javax.swing.JButton();
+        jButtonRefresh = new javax.swing.JButton();
 
         jPanelFriendList.setToolTipText("");
         jPanelFriendList.setPreferredSize(new java.awt.Dimension(453, 200));
@@ -113,13 +131,13 @@ public class HomePage extends javax.swing.JPanel implements Observer{
         jPanelGroupList.setLayout(new javax.swing.BoxLayout(jPanelGroupList, javax.swing.BoxLayout.LINE_AXIS));
         jTabbedPane5.addTab("Group", jPanelGroupList);
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane3.setViewportView(jTextArea1);
-
-        jTextField1.setText("insert text here");
+        jTextAreaBroadcastChat.setColumns(20);
+        jTextAreaBroadcastChat.setRows(5);
+        jScrollPane3.setViewportView(jTextAreaBroadcastChat);
 
         jButton1.setText("SEND");
+
+        jLabel1.setText("Insert broadcast text below:");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -128,38 +146,43 @@ public class HomePage extends javax.swing.JPanel implements Observer{
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 332, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE))
-                    .addComponent(jScrollPane3))
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 377, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jTextField1)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
         jTabbedPane5.addTab("Broadcast", jPanel3);
 
-        jButton2.setText("LOGOUT");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        jButtonLogout.setText("LOGOUT");
+        jButtonLogout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                jButtonLogoutActionPerformed(evt);
             }
         });
 
-        jButton3.setText("REFRESH");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        jButtonRefresh.setText("REFRESH");
+        jButtonRefresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                jButtonRefreshActionPerformed(evt);
             }
         });
 
@@ -173,9 +196,9 @@ public class HomePage extends javax.swing.JPanel implements Observer{
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButtonRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButtonLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
         );
         layout.setVerticalGroup(
@@ -183,31 +206,43 @@ public class HomePage extends javax.swing.JPanel implements Observer{
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButtonLogout, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
+                    .addComponent(jButtonRefresh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 423, Short.MAX_VALUE)
+                .addComponent(jTabbedPane5)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void jButtonLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLogoutActionPerformed
+        try {
+            PacketLogout packetLoggingout = new PacketLogout(PacketType.LOGOUT, 0, SourceType.CLIENT, connRecv.user.get().getId());
+            connSend.addPacket(packetLoggingout);
+            this.connRecv.home.get().deleteObservers();
+            this.connRecv.user.get().setId(null);
+            this.connRecv.user.get().setUsername(null);
+            this.connRecv.user.get().setAuthenticated(false);
+            this.gui.setMainPanelTo(new InitPage(gui, connRecv, connSend));
+        } catch (IOException ex) {
+            JOptionPane.showConfirmDialog(null, "Error IO", "Error", JOptionPane.NO_OPTION, JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButtonLogoutActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButtonRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRefreshActionPerformed
         PacketGetOnlineClient requestOnlineClient = new PacketGetOnlineClient(PacketType.GET_ONLINE_CLIENT,
                 0,
                 SourceType.CLIENT,
+                connRecv.user.get().getId(),
                 connRecv.socket.getLocalSocketAddress().toString().substring(1));
         connSend.addPacket(requestOnlineClient);
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_jButtonRefreshActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButtonLogout;
+    private javax.swing.JButton jButtonRefresh;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanelFriendList;
     private javax.swing.JPanel jPanelFriendSubFrame;
@@ -215,15 +250,16 @@ public class HomePage extends javax.swing.JPanel implements Observer{
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPaneFriendList;
     private javax.swing.JTabbedPane jTabbedPane5;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea jTextAreaBroadcastChat;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void update(Observable o, Object arg) {
-        
-        for (int i = 0; i < connRecv.onlineIds.size(); i++) {
-            addNewFriendList(connRecv.onlineIds.get(i));
+        Home update = (Home) o;
+        resetFriendList();
+        for (int i = 0; i < update.getOnlineIds().size(); i++) {
+            addNewFriendList(update.getOnlineIds().get(i));
         }
     }
 }

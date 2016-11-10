@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import server.controller.ChatServerController;
 import server.model.db.JDBCMySQLManager;
 import server.model.packet.ChatType;
 import server.model.packet.Packet;
@@ -27,8 +28,6 @@ import server.model.packet.SourceType;
  */
 public class TaskChatSendExecutor extends TaskExecutor {
 
-    private JDBCMySQLManager dbManager;
-
     public TaskChatSendExecutor(ConcurrentHashMap<String, Socket> connectedSockets, CopyOnWriteArrayList<Socket> connectedServerSockets, Packet packet) {
         super(connectedSockets, connectedServerSockets, packet);
     }
@@ -36,7 +35,8 @@ public class TaskChatSendExecutor extends TaskExecutor {
     @Override
     public void run() {
         try {
-            dbManager = new JDBCMySQLManager();
+
+            System.out.println("Count Server connected " + connectedServerSockets.size());
             PacketChatSend receivedPacket = (PacketChatSend) this.packet;
             BufferedWriter bufferedWriter;
             PacketChatSend chatSend = new PacketChatSend(receivedPacket.command,
@@ -52,37 +52,49 @@ public class TaskChatSendExecutor extends TaskExecutor {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             } else {
                 System.out.println("Inserting Chat to Database");
-                dbManager.insertChat(receivedPacket.idPengirim, receivedPacket.idPenerima, receivedPacket.chat, receivedPacket.timestamp);
+                ChatServerController.dbManager.insertChat(receivedPacket.idPengirim, receivedPacket.idPenerima, receivedPacket.chat, receivedPacket.timestamp);
                 int a;
                 if (receivedPacket.chatType == ChatType.BROADCAST) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                } else if (receivedPacket.chatType == ChatType.PRIVATE) {
                     if (receivedPacket.sourceType == SourceType.CLIENT) {
-                        /*
                         //kirim ke semua server
                         for (Socket connectedServerSocket : connectedServerSockets) {
                             bufferedWriter = new BufferedWriter(new OutputStreamWriter(connectedServerSocket.getOutputStream()));
-
-                            bufferedWriter.write(chatSend.toString());
-                            bufferedWriter.flush();
-                            bufferedWriter.close();
-                        }*/
-                        //cari ipnya dl d database
-                        String ipAddressPenerima = dbManager.getIpAddressPortUser(receivedPacket.idPenerima);
-                        if (connectedSockets.containsKey(ipAddressPenerima)) {
-                            Socket clientSocket = connectedSockets.get(ipAddressPenerima);
-                            System.out.println("Send chat to client "+ clientSocket.getRemoteSocketAddress().toString() + " :"+chatSend.toString());
-                            bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                             bufferedWriter.write(chatSend.toString());
                             bufferedWriter.flush();
                         }
+                    }
+                    //mengirim ke semua client yang terhubung
+                    for (Socket clientSocket : connectedSockets.values()) {
+                        bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+                        bufferedWriter.write(chatSend.toString());
+                        bufferedWriter.flush();
+                    }
+
+                } else if (receivedPacket.chatType == ChatType.PRIVATE) {
+                    if (receivedPacket.sourceType == SourceType.CLIENT) {
+                        //kirim ke semua server
+                        for (Socket connectedServerSocket : connectedServerSockets) {
+                            bufferedWriter = new BufferedWriter(new OutputStreamWriter(connectedServerSocket.getOutputStream()));
+                            System.out.println("Sending to server " + connectedServerSocket.getRemoteSocketAddress().toString() + " :" + chatSend.toString());
+                            bufferedWriter.write(chatSend.toString());
+                            bufferedWriter.flush();
+                        }
+                    }
+                    //cari ipnya dl d database
+                    String ipAddressPenerima = ChatServerController.dbManager.getIpAddressPortUser(receivedPacket.idPenerima);
+                    //mengirim ke ipnya kalo terhubung dengan server
+                    if (connectedSockets.containsKey(ipAddressPenerima)) {
+                        Socket clientSocket = connectedSockets.get(ipAddressPenerima);
+                        System.out.println("Send chat to client " + clientSocket.getRemoteSocketAddress().toString() + " :" + chatSend.toString());
+                        bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+                        bufferedWriter.write(chatSend.toString());
+                        bufferedWriter.flush();
                     }
                 } else {
                     // Tipe pesannya salah
                     throw new UnsupportedOperationException("Not supported yet.");
                 }
             }
-            dbManager.close();
             this.thread.join();
         } catch (Exception ex) {
             Logger.getLogger(TaskChatSendExecutor.class.getName()).log(Level.SEVERE, null, ex);

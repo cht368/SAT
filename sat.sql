@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 05, 2016 at 04:04 PM
+-- Generation Time: Nov 10, 2016 at 06:39 AM
 -- Server version: 5.7.13-log
 -- PHP Version: 5.6.23
 
@@ -30,7 +30,7 @@ CREATE TABLE `chat` (
   `id_sender` varchar(30) NOT NULL,
   `id_receiver` varchar(30) NOT NULL,
   `chat_message` varchar(255) NOT NULL,
-  `date` date NOT NULL
+  `datetime` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -43,7 +43,7 @@ CREATE TABLE `group_chat` (
   `id_sender` varchar(30) NOT NULL,
   `id_group` varchar(30) NOT NULL,
   `chat_message` varchar(255) NOT NULL,
-  `timestamp` date NOT NULL
+  `datetime` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -66,9 +66,16 @@ CREATE TABLE `group_sat` (
 CREATE TABLE `server` (
   `id` varchar(255) NOT NULL,
   `ip_address` varchar(15) NOT NULL,
-  `port` int(11) NOT NULL,
-  `status` varchar(30) NOT NULL
+  `port` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `server`
+--
+
+INSERT INTO `server` (`id`, `ip_address`, `port`) VALUES
+('testingServer', '127.0.0.1', 2013),
+('testingServer1', '127.0.0.1', 2012);
 
 -- --------------------------------------------------------
 
@@ -79,12 +86,22 @@ CREATE TABLE `server` (
 CREATE TABLE `user_sat` (
   `id` varchar(30) NOT NULL,
   `id_server` varchar(255) NOT NULL,
-  `ip_address` varchar(15) DEFAULT NULL,
+  `ip_address_port` varchar(25) DEFAULT NULL,
   `passwd` varchar(255) DEFAULT NULL,
   `prof_name` varchar(50) DEFAULT NULL,
   `public_key` varchar(255) DEFAULT NULL,
-  `last_status` varchar(10) DEFAULT NULL
+  `current_status` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `user_sat`
+--
+
+INSERT INTO `user_sat` (`id`, `id_server`, `ip_address_port`, `passwd`, `prof_name`, `public_key`, `current_status`) VALUES
+('broadcast', 'testingServer', '127.0.0.1:27015', 'slansdjlsndfasjkdbvasdjabksdhbfeawyiu', 'broadcast', 'fasbdfkashvasjgdvfasjdfgaisyufbasdjhvasdfaj', 'offline'),
+('cete', 'testingServer1', '127.0.0.1:56565', 'testing', 'Christian Thomas', 'testing', 'offline'),
+('egaprianto', 'testingServer', '127.0.0.1:56564', 'testing', 'Ega Prianto', 'testing', 'offline'),
+('testing', 'testingServer', '127.0.0.1:56595', 'testing', 'testing', 'testing', 'offline');
 
 --
 -- Indexes for dumped tables

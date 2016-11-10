@@ -7,6 +7,9 @@ package client.view;
 
 import client.model.ConnectionReceiver;
 import client.model.ConnectionSender;
+import server.model.packet.PacketRegister;
+import server.model.packet.PacketType;
+import server.model.packet.SourceType;
 
 /**
  *
@@ -60,6 +63,11 @@ public class RegisterUI extends javax.swing.JPanel {
 
         jButtonRegister.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jButtonRegister.setText("Register");
+        jButtonRegister.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRegisterActionPerformed(evt);
+            }
+        });
 
         jButtonLogin.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jButtonLogin.setText("Login");
@@ -123,6 +131,11 @@ public class RegisterUI extends javax.swing.JPanel {
     private void jButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLoginActionPerformed
         this.gui.setMainPanelTo(new LoginUI(gui, connRecv, connSend));
     }//GEN-LAST:event_jButtonLoginActionPerformed
+
+    private void jButtonRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegisterActionPerformed
+        PacketRegister packetRegister = new PacketRegister(PacketType.REGISTER, 0, SourceType.CLIENT, this.jTextFieldID.getText(), new String(this.jPasswordField.getPassword()), this.jTextFieldProfileName.getText(), this.connRecv.socket.getRemoteSocketAddress().toString().substring(1));
+        this.connSend.addPacket(packetRegister);
+    }//GEN-LAST:event_jButtonRegisterActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

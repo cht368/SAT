@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import server.model.ConnectionManager;
+import server.model.db.JDBCMySQLManager;
 import server.model.packet.Packet;
 import server.model.task.manager.TaskManager;
 
@@ -26,11 +27,13 @@ public class ChatServerController {
     private ConcurrentLinkedQueue<Packet> packetQueue;
     private ConcurrentHashMap<String, Socket> connectedSockets;
     private CopyOnWriteArrayList< Socket> connectedServerSockets;
+    public static JDBCMySQLManager dbManager;
 
-    public ChatServerController() {
+    public ChatServerController(JDBCMySQLManager dbManager) {
         packetQueue = new ConcurrentLinkedQueue<>();
         connectedSockets = new ConcurrentHashMap<>();
         connectedServerSockets = new CopyOnWriteArrayList<>();
+        this.dbManager = dbManager;
     }
 
     public void startServer(int port) throws IOException {

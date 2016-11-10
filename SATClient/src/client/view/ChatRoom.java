@@ -5,6 +5,7 @@
  */
 package client.view;
 
+import client.model.ConnectionReceiver;
 import client.model.ConnectionSender;
 import client.model.clientData.Chat;
 import java.io.BufferedWriter;
@@ -30,30 +31,51 @@ import server.model.packet.SourceType;
  * @author ASUS A455LF
  */
 public class ChatRoom extends javax.swing.JFrame implements Observer, Runnable {
-    
+
     private Chat chats;
     private ChatType chatType;
     private String userId;
     private String idLawan;
     private ConnectionSender connSend;
+    private ConnectionReceiver connRecv;
 
-    public ChatRoom(Chat chats, ChatType chatType, String userId, String idLawan, ConnectionSender connSend) {
+    public ChatRoom(Chat chats, ChatType chatType, String userId, String idLawan, ConnectionSender connSend,ConnectionReceiver connRecv) {
         initComponents();
         this.chats = chats;
         this.chatType = chatType;
         this.userId = userId;
         this.idLawan = idLawan;
-        this.connSend= connSend;
+        this.connSend = connSend;
         System.out.println(toString());
+        this.connRecv = connRecv;
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        
+        this.jTextAreaChatArea.setEditable(false);
+        this.jTextAreaChatArea.setText(chats.toString());
+        /*Some piece of code*/
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                connRecv.chatRoomsData.remove(idLawan);
+                dispose();
+            }
+        });
+    }
+
+    public static void popChatWindow(Chat chats, ChatType chatType, String userId, String idLawan, ConnectionSender connSend,ConnectionReceiver connRecv) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ChatRoom chatRoom = new ChatRoom(chats, chatType, userId, idLawan, connSend,connRecv);
+                chats.addObserver(chatRoom);
+                chatRoom.setVisible(true);
+            }
+        }).start();
     }
 
     @Override
     public String toString() {
         return "ChatRoom{" + "chats=" + chats + ", chatType=" + chatType + ", userId=" + userId + ", idLawan=" + idLawan + ", jTextFieldChatInput=" + jTextFieldChatInput.getText() + '}';
     }
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -123,11 +145,11 @@ public class ChatRoom extends javax.swing.JFrame implements Observer, Runnable {
         System.out.println(toString());
         long currentTime = System.currentTimeMillis();
         Date currentDate = new Date(currentTime);
-        PacketChatSend newPacketChatSend = new PacketChatSend(PacketType.CHAT_SEND, 0, SourceType.CLIENT, chatType, userId, this.idLawan, this.jTextFieldChatInput.getText(), JDBCMySQLManager.DATE_FORMAT.format(currentDate));
+        PacketChatSend newPacketChatSend = new PacketChatSend(PacketType.CHAT_SEND, 0, SourceType.CLIENT, chatType, userId, this.idLawan, this.jTextFieldChatInput.getText(), GraphicalUI.DATE_FORMAT.format(currentDate));
         this.chats.addSelfChat(newPacketChatSend.chat, currentTime);
         System.out.println("Sending packet : " + newPacketChatSend.toString());
         System.out.println("body data : " + newPacketChatSend.getBodyData());
-        connSend.addPacket(newPacketChatSend); 
+        connSend.addPacket(newPacketChatSend);
     }//GEN-LAST:event_jButtonSendChatActionPerformed
 
 
