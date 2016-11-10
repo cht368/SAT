@@ -24,10 +24,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import server.model.db.JDBCMySQLManager;
 import server.model.packet.ChatType;
 import server.model.packet.Packet;
 import server.model.packet.PacketChatSend;
+import server.model.packet.PacketDefaultResponse;
 import server.model.packet.PacketFactory;
 import server.model.packet.PacketGetOnlineServer;
 import server.model.packet.PacketGotOnline;
@@ -140,8 +142,12 @@ public class ConnectionReceiver implements Runnable {
                         }
                         break;
                     case DEFAULT_RESPONSE:
-                        ;
-                        
+                        if (receivedPacket instanceof PacketDefaultResponse) {
+                            PacketDefaultResponse getResponse = (PacketDefaultResponse) receivedPacket;
+                            JOptionPane.showConfirmDialog(null, getResponse.response, "Server Response", JOptionPane.NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                        }
+                        break;
+
                 }
             }
         } catch (IOException ex) {
