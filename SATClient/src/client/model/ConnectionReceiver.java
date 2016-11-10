@@ -139,6 +139,8 @@ public class ConnectionReceiver implements Runnable {
                             this.home.get().removeOnlineId(getLogout.id);
                         }
                         break;
+                    case DEFAULT_RESPONSE:
+                        ;
                         
                 }
             }
